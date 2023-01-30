@@ -2,6 +2,7 @@ import json
 import os
 import time
 import random
+import uuid
 
 taxi_id=os.getenv('TAXI_ID')
 topic_id=os.getenv('TOPIC_ID')
@@ -33,14 +34,18 @@ def generatedata():
         lat = 39.4 + random.uniform(-0.5, 0.5)
         lng = -0.4 + random.uniform(-0.5, 0.5)
         return (lat, lng)
+    
+    def taxi_id():
+        return str(uuid.uuid4())
 
-    data={}
-    data["userid"]=user_id
-    data["location"]= random_location_in_Valencia()
-    data["date"]= random_date()
-    data["time"]= random_time()
 
-    return json.dumps(data)
+    data_taxi={}
+    data_taxi["location"]= random_location_in_Valencia()
+    data_taxi["date"]= random_date()
+    data_taxi["time"]= random_time()
+    data_taxi["taxi_id"]=taxi_id()
+
+    return json.dumps(data_taxi)
 
 def senddata():
 
