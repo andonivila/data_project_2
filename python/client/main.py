@@ -8,13 +8,19 @@ topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
 def generatedata(type):
-    if type == "taxi":
-        data={}
-        data["userid"]=user_id
+    import random
 
-    elif type == "user":
-        data={}
-        data["userid"]=user_id
+    def random_time():
+        hour = random.randint(0, 23)
+        minute = random.randint(0, 59)
+        second = random.randint(0, 59)
+        return "{:02d}:{:02d}:{:02d}".format(hour, minute, second)
+
+        print(random_time())
+
+    random_time()
+    data={}
+    data["userid"]=user_id
 
     return json.dumps(data)
 
