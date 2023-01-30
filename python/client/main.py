@@ -8,10 +8,13 @@ topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
 def generatedata(type):
+
+    # Generate taxi data 
     if type == "taxi":
         data={}
         data["userid"]=user_id
 
+    # Generate user data
     elif type == "user":
         data={}
         data["userid"]=user_id
