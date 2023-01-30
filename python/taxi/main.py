@@ -3,7 +3,7 @@ import os
 import time
 import random
 
-user_id=os.getenv('USER_ID')
+taxi_id=os.getenv('TAXI_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
@@ -40,7 +40,7 @@ def generatedata(type):
     random_time()
 
     data={}
-    data["userid"]=user_id
+    data["taxiid"]=taxi_id
 
     return json.dumps(data)
 
