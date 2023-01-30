@@ -1,14 +1,21 @@
 import json
 import os
 import time
+import random
 
 user_id=os.getenv('USER_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
-def generatedata():
-    data={}
-    data["userid"]=user_id
+def generatedata(type):
+    if type == "taxi":
+        data={}
+        data["userid"]=user_id
+
+    elif type == "user":
+        data={}
+        data["userid"]=user_id
+
     return json.dumps(data)
 
 def senddata():
