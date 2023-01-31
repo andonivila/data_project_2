@@ -102,7 +102,5 @@ def senddata(project_id, topic_name):
     
 
 if __name__ == "__main__":
-    while True: 
         logging.getLogger().setLevel(logging.INFO)
         senddata(project_id, topic_name)
-        time.sleep(time_lapse)
