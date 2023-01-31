@@ -4,19 +4,46 @@ import time
 import random
 from faker import Faker
 import datetime
+from google.cloud import pubsub_v1
+import google.auth
+import logging
+import argparse
 
 
 ###########################
 ### TAXI DATA GENERATOR ###
 ###########################
 
+
 fake = Faker()
 
+# Initial variables
 user_id=os.getenv('USER_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
+project_id = "data-project-2-376316"
+topic_name = "taxi_position"
+
+
 ## Clase de pubsub
+class PubSubMessages:
+    """ Publish Messages in our PubSub Topic """
+
+    def __init__(self, project_id, topic_name):
+        self.publisher = pubsub_v1.PublisherClient()
+        self.project_id = project_id
+        self.topic_name = topic_name
+
+    def publishMessages(self, message):
+        json_str = json.dumps(message)
+        topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
+        self.publisher.publish(topic_path, json_str.encode("utf-8"))
+        logging.info("A new taxi is available. Id: %s", message['taxi_id'])
+
+    def __exit__(self):
+        self.publisher.transport.close()
+        logging.info("PubSub Client closed.")
 
 # Generación de una posición random en la ciudad de Valencia
 def generate_random_position():
@@ -56,17 +83,27 @@ def generatedata():
 
 
 def senddata():
-
-    # Coloca el código para enviar los datos a tu sistema de mensajería
-    # Utiliza la variable topic id para especificar el topico destino
     print(generatedata())
-
-
-
-
+    pubsub_class = PubSubMessages(project_id, topic_name)
+    #Publish message into the queue every 5 seconds
+    try:
+        while True:
+            message: generatedata()
+            pubsub_class.publishMessages(message)
+            #it will be generated a transaction each 2 seconds
+            time.sleep(time_lapse)
+    except Exception as err:
+        logging.error("Error while inserting data into out PubSub Topic: %s", err)
+    finally:
+        pubsub_class.__exit__()
+    
 
 while True:
+    logging.getLogger().setLevel(logging.INFO)
     senddata()
-
-
     time.sleep(time_lapse)
+
+# if __name__ == "__main__":
+#     logging.getLogger().setLevel(logging.INFO)
+#     senddata(args.project_id, args.topic_name)
+    
