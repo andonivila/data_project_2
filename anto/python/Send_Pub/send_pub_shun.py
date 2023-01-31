@@ -1,21 +1,19 @@
-import logging
-import time
 from google.cloud import pubsub_v1
 
+# Your Google Cloud project ID
+project_id = "elevated-column-376015"
 
+# The name of the Pub/Sub topic to which you want to publish
+topic_name = "prueba_send_1"
 
+# Set up the Pub/Sub client
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(project_id, topic_name)
 
+# Publish the message and wait for it to be completed
+message = "Hello, Pub/Sub2!"
+future = publisher.publish(topic_path, data=message.encode("utf-8"))
+result = future.result()
 
-def run_generator(project_id, topic_name):
-    pubsub_class = PubSubMessages(project_id, topic_name)
-    #Publish message into the queue every 5 seconds
-    try:
-        while True:
-            message: dict = generateMockData()
-            pubsub_class.publishMessages(message)
-            #it will be generated a transaction each 2 seconds
-            time.sleep(5)
-    except Exception as err:
-        logging.error("Error while inserting data into out PubSub Topic: %s", err)
-    finally:
-        pubsub_class.__exit__()
+# The message has been successfully published
+print("Message published with ID: {}".format(result))
