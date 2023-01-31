@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY main.py main.py
 COPY requirements.txt requirements.txt
+COPY data-project-2-376316-7ec597825415.json data-project-2-376316-7ec597825415.json
 
 RUN pip install -r requirements.txt
 

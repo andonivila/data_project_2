@@ -16,11 +16,14 @@ import argparse
 
 
 fake = Faker()
+parser = argparse.ArgumentParser(description=('Aixigo Contracts Dataflow pipeline.'))
+
 
 # Initial variables
 user_id=os.getenv('USER_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-7ec597825415.json" 
 
 project_id = "data-project-2-376316"
 topic_name = "taxi_position"
@@ -79,16 +82,16 @@ def generatedata():
     data["timestamp"] = str(datetime.datetime.now())
 
 
-    return json.dumps(data)
+    return data
 
 
-def senddata():
+def senddata(project_id, topic_name):
     print(generatedata())
     pubsub_class = PubSubMessages(project_id, topic_name)
     #Publish message into the queue every 5 seconds
     try:
         while True:
-            message: generatedata()
+            message: dict =  generatedata()
             pubsub_class.publishMessages(message)
             #it will be generated a transaction each 2 seconds
             time.sleep(time_lapse)
@@ -98,12 +101,8 @@ def senddata():
         pubsub_class.__exit__()
     
 
-while True:
-    logging.getLogger().setLevel(logging.INFO)
-    senddata()
-    time.sleep(time_lapse)
-
-# if __name__ == "__main__":
-#     logging.getLogger().setLevel(logging.INFO)
-#     senddata(args.project_id, args.topic_name)
-    
+if __name__ == "__main__":
+    while True: 
+        logging.getLogger().setLevel(logging.INFO)
+        senddata(project_id, topic_name)
+        time.sleep(time_lapse)
