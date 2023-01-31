@@ -1,21 +1,22 @@
+import logging
+import time
 from google.cloud import pubsub_v1
 
 
-def send_mensagge (project_id, topic_name):
-    #Escribir el ID del proyecto
-    project_id = "ID->DEL_PROYECTO_AQUI"
 
-    #Nombre del topic donde queramos publicar
-    topic_name = "TOPIC->DEL_PROYECTO_AQUI"
 
-    # Preparacion del cliente de Pub/Sub 
-    publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path(project_id, topic_name)
 
-    # Publica el mensaje y esperar a que se complete el proceso
-    message = " " <-- EL MENSAJE AQUI 
+def run_generator(project_id, topic_name):
+    pubsub_class = PubSubMessages(project_id, topic_name)
+    #Publish message into the queue every 5 seconds
+    try:
+        while True:
+            message: dict = #NombreDeLaFuncionQueGeneraDatos
+            pubsub_class.publishMessages(message)
+            #it will be generated a transaction each 2 seconds
+            time.sleep(5)
+    except Exception as err:
+        logging.error("Error while inserting data into out PubSub Topic: %s", err)
+    finally:
+        pubsub_class.__exit__()
 
-    future = publisher.publish(topic_path, data=message.encode("utf-8"))
-    result = future.result()
-
-    return print("Message published with ID: {}".format(result))
