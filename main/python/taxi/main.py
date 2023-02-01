@@ -26,7 +26,7 @@ project_id = "data-project-2-376316"
 topic_name = "taxi_position"
 
 
-## Clase de pubsub
+## PUB/SUB class declaration
 class PubSubMessages:
     """ Publish Messages in our PubSub Topic """
 
@@ -45,12 +45,13 @@ class PubSubMessages:
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
-# Generación de una posición random en la ciudad de Valencia
+# Genarate a random location in Valencia
 def generate_random_position():
     latitude = random.uniform(39.4, 39.5)
     longitude = random.uniform(-0.4, -0.3)
     return (latitude, longitude)
 
+#Generate a random Spanish phone number
 def generate_phone_number():
   country_code = "+34"
   primer_numero = str(6)
@@ -63,12 +64,12 @@ def generate_phone_number():
   return phone_number
 
 
-
+# Taxi data declaration
 phone_number = generate_phone_number()
 position = generate_random_position()
 payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 
-
+# Generate Data function
 def generatedata():
 
     data={}
@@ -81,7 +82,7 @@ def generatedata():
 
     return data
 
-
+# Send the data to the PUB/SUB topic
 def senddata(project_id, topic_name):
     print(generatedata())
     pubsub_class = PubSubMessages(project_id, topic_name)
