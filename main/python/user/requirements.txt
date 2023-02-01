@@ -1,1 +1,3 @@
-Faker
+FakerFaker
+google.auth
+google-cloud-pubsub

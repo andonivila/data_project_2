@@ -13,8 +13,29 @@ fake = Faker()
 user_id=os.getenv('USER_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
-## Clase de pubsub
+project_id = "data-project-2-376316"
+topic_name = "user_position"
+
+## PUB/SUB class declaration
+class PubSubMessages:
+    """ Publish Messages in our PubSub Topic """
+
+    def __init__(self, project_id, topic_name):
+        self.publisher = pubsub_v1.PublisherClient()
+        self.project_id = project_id
+        self.topic_name = topic_name
+
+    def publishMessages(self, message):
+        json_str = json.dumps(message)
+        topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
+        self.publisher.publish(topic_path, json_str.encode("utf-8"))
+        logging.info("A new user is looking for a ride. Id: %s", message['userid'])
+
+    def __exit__(self):
+        self.publisher.transport.close()
+        logging.info("PubSub Client closed.")
 
 # Generación de una posición random en la ciudad de Valencia
 def generate_random_position():
@@ -52,27 +73,7 @@ def generatedata():
     data["timestamp"] = str(datetime.datetime.now())
 
 
-    return json.dumps(data)
-
-
-## Clase de pubsub
-class PubSubMessages:
-    """ Publish Messages in our PubSub Topic """
-
-    def __init__(self, project_id, topic_name):
-        self.publisher = pubsub_v1.PublisherClient()
-        self.project_id = project_id
-        self.topic_name = topic_name
-
-    def publishMessages(self, message):
-        json_str = json.dumps(message)
-        topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
-        self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new taxi is available. Id: %s", message['taxi_id'])
-
-    def __exit__(self):
-        self.publisher.transport.close()
-        logging.info("PubSub Client closed.")
+    return data
 
 
 def senddata(project_id, topic_name):
@@ -92,8 +93,6 @@ def senddata(project_id, topic_name):
     
 
 
-while True:
-    senddata()
-
-
-    time.sleep(time_lapse)
+if __name__ == "__main__":
+        logging.getLogger().setLevel(logging.INFO)
+        senddata(project_id, topic_name)
