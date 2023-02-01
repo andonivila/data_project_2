@@ -14,6 +14,9 @@ user_id=os.getenv('USER_ID')
 topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 
+project_id = "data-project-2-376316"
+topic_name = "taxi_position"
+
 ## Clase de pubsub
 
 # Generación de una posición random en la ciudad de Valencia
@@ -92,8 +95,7 @@ def senddata(project_id, topic_name):
     
 
 
-while True:
-    senddata()
 
-
-    time.sleep(time_lapse)
+if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.INFO)
+    senddata(project_id, topic_name)
