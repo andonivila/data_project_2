@@ -5,7 +5,6 @@ import random
 from faker import Faker
 import datetime
 from google.cloud import pubsub_v1
-import google.auth
 import logging
 import argparse
 
@@ -16,8 +15,6 @@ import argparse
 
 
 fake = Faker()
-parser = argparse.ArgumentParser(description=('Aixigo Contracts Dataflow pipeline.'))
-
 
 # Initial variables
 user_id=os.getenv('USER_ID')
