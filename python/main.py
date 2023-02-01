@@ -1,4 +1,4 @@
-import docker
+#import docker
 import sys, getopt
 import time
 import os
