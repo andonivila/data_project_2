@@ -12,11 +12,6 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "Transaction_Amount",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
         "name": "Payment_method",
         "type": "STRING"
     },
@@ -48,6 +43,11 @@
     {
         "mode": "NULLABLE",
         "name": "Distance",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Transaction_Amount",
         "type": "NUMERIC"
     },
     {

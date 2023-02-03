@@ -37,12 +37,6 @@ class PubSubMessages:
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
-# Generación de una posición random en la ciudad de Valencia
-def generate_random_position():
-    latitude = random.uniform(39.4, 39.5)
-    longitude = random.uniform(-0.4, -0.3)
-    return (latitude, longitude)
-
 def generate_phone_number():
   country_code = "+34"
   primer_numero = str(6)
@@ -58,20 +52,28 @@ def generate_phone_number():
 name = fake.name()
 phone_number = generate_phone_number()
 email = fake.email()
-init_location = generate_random_position()
-final_location = generate_random_position()
+
+# Genarating random location data for Valencia
+init_location_lat = random.uniform(39.4, 39.5)
+init_location_long = random.uniform(-0.4, -0.3)
+final_location_lat = random.uniform(39.4, 39.5)
+final_location_long = random.uniform(-0.4, -0.3)
+
+
 payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 
 def generatedata():
 
     data={}
-    data["userid"]=user_id
+    data["userid"]= user_id
     data["user_name"]= name
-    data["phone_number"]=phone_number
-    data["email"]=email
-    data["init_location"]=init_location
-    data["final_location"]=final_location
-    data["payment_method"]=payment_method
+    data["phone_number"]= phone_number
+    data["email"]= email
+    data["init_location_lat"]= init_location_lat
+    data["init_location_long"]= init_location_long
+    data["final_location_lat"]= final_location_lat
+    data["final_location_long"]= final_location_long
+    data["payment_method"]= payment_method
     data["timestamp"] = str(datetime.datetime.now())
 
 
