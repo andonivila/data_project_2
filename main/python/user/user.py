@@ -3,7 +3,6 @@ import os
 import time
 import random
 from faker import Faker
-import datetime
 from google.cloud import pubsub_v1
 import logging
 
@@ -31,7 +30,7 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new user is looking for a ride. Id: %s", message['userid'])
+        logging.info("A new user is looking for a ride. Id: %s", message['user_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
