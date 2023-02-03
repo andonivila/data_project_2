@@ -81,7 +81,7 @@ def run_pipeline():
 
     ### Apache Beam Pipeline
     #Pipeline options
-    options = PipelineOptions(pipeline_opts, save_main_sassion = True, streaming = True, project = project_id)
+    options = PipelineOptions(pipeline_opts, save_main_session = True, streaming = True, project = project_id)
 
     #Pipeline
     with beam.Pipeline(argv=pipeline_opts, options=options) as p:
