@@ -55,6 +55,10 @@ class AddTimestampDoFn(beam.DoFn):
         element['Processing_Time'] = str(datetime.now())
         yield element
 
+class getLocationsDoFn(beam.DoFn):
+    def process(self, element):
+        yield ['Userinit_lat', 'Userinit_lng', 'Taxi_lat','Taxi_lng','Userfinal_lat','Userfinal_lng']
+
 
 '''Dataflow Process'''
 def run_pipeline():
@@ -112,6 +116,10 @@ def run_pipeline():
 
         ###Step05: Claculate distance between taxi and initial user loc and get the closest. User leads in the processing window
 
+        (
+           data 
+                |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+        )
         
 
 
