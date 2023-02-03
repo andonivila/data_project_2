@@ -49,7 +49,7 @@
         "mode": "NULLABLE",
         "name": "Distance",
         "type": "NUMERIC"
-    }
+    },
     {
         "mode": "NULLABLE",
         "name": "Operation_Id",
