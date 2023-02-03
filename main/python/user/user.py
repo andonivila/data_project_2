@@ -5,6 +5,7 @@ import random
 from faker import Faker
 from google.cloud import pubsub_v1
 import logging
+import string
 
 
 fake = Faker()
