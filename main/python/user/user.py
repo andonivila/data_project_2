@@ -58,7 +58,8 @@ def generate_phone_number():
 name = fake.name()
 phone_number = generate_phone_number()
 email = fake.email()
-location = generate_random_position()
+init_location = generate_random_position()
+final_location = generate_random_position()
 payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 
 def generatedata():
@@ -68,7 +69,8 @@ def generatedata():
     data["user_name"]= name
     data["phone_number"]=phone_number
     data["email"]=email
-    data["location"]=location
+    data["init_location"]=init_location
+    data["final_location"]=final_location
     data["payment_method"]=payment_method
     data["timestamp"] = str(datetime.datetime.now())
 
