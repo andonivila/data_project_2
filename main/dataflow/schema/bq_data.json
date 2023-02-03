@@ -72,7 +72,7 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance",
+        "name": "Final_Distance",
         "type": "NUMERIC"
     },
     {
