@@ -101,38 +101,19 @@ def run_pipeline():
                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
-        ###Step02: Write raw data to BigQuery for analytics
+        ###Step02: Merge Data from taxi and user topics into one PColl
+        # Here we have taxi and user data in the same  table
+        data = (user_data, taxi_data) | beam.Flatten()
 
-        # User data to BigQuery
-        (
-            user_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-            table = f"{project_id}:{user_bq_output}",
-            schema = schema,
-            create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-            write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-            )
-        )
 
-        # Taxi data to BigQuery
-        (
-            taxi_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-            table = f"{project_id}:{taxi_bq_output}",
-            schema = schema,
-            create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-            write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-            )
-        )
+        ###Step03: Write the merged data to a BigQuery Table
 
-        ###Step03: Merge Data from taxi and user topics
-        
+
         
     
 
-
-
-
-
-
-
-
-run_pipeline()
+if __name__ == '__main__' : 
+    #Add Logs
+    logging.getLogger().setLevel(logging.INFO)
+    #Run process
+    run_pipeline()

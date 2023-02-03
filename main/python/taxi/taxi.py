@@ -100,5 +100,5 @@ def senddata(project_id, topic_name):
     
 
 if __name__ == "__main__":
-        logging.getLogger().setLevel(logging.INFO)
+        logging.getLogger().setLevel(logging.INFO) 
         senddata(project_id, topic_name)
