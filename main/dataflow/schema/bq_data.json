@@ -89,6 +89,11 @@
         "mode": "NULLABLE",
         "name": "Operation_timestamp",
         "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Processing_Time",
+        "type": "STRING"
     }
     ]
 }

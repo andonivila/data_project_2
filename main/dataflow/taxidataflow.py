@@ -27,11 +27,6 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
-user_bq_output = "dataproject2376316.user_data"
-taxi_bq_output = "dataproject2376316.taxi_data"
-taxi_bq_schema_path = "" #Completar
-user_bq_schema_path = "" #Completar
-
 
 '''Functions'''
 def ParsePubSubMessage(message):
@@ -86,27 +81,39 @@ def run_pipeline():
     #Pipeline
     with beam.Pipeline(argv=pipeline_opts, options=options) as p:
 
-        ###Step01: Read user and taxi data from PUB/SUB and add Timestamp
+        ###Step01: Read user and taxi data from PUB/SUB
         user_data = (
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
         data = (user_data, taxi_data) | beam.Flatten()
 
+        ###Step03: Add processing timestamp
 
-        ###Step03: Write the merged data to a BigQuery Table
+        ###Step04: Write combined data to BigQuery
+        (
+            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+                table = f"{project_id}:{args.output_bigquery}",
+                schema = schema,
+                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+            )
+        )
+
+        ###Step05: Claculate distance between taxi and initial user loc and get the closest. User leads in the processing window
+
+        
+
 
 
         
