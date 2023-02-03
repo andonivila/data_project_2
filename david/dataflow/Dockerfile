@@ -6,7 +6,7 @@ WORKDIR ${WORKDIR}
 
 COPY requirements.txt .
 COPY taxidataflow.py .
-COPY ./schema/*.json schema/
+COPY ./schema/usertaxi.json schema/
 
 # Do not include apache-beam in requirements.txt
 ENV FLEX_TEMPLATE_PYTHON_REQUIREMENTS_FILE="${WORKDIR}/requirements.txt"

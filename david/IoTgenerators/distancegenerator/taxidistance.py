@@ -1,12 +1,17 @@
-import google.auth
-import requests
+import googlemaps
+import os
 from google.cloud import bigquery
 from google.oauth2.service_account import Credentials
 
 # Autentificar con BigQuery usando las credenciales de la cuenta de servicio
-credentials = Credentials.from_service_account_file("path/to/service_account.json")
+credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
 project_id = "data-project-2-376316"
 client = bigquery.Client(credentials=credentials, project=project_id)
+
+'''
+CHEQUEAR QUE OPCION ES VALIDA UNA VEZ CONECTEMOS CON BIGQUERY
+credentials = os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-6817462f9a56.json" 
+'''
 
 # Crea la consulta SQL para obtener coordenadas de ubicacion del taxi, ubicacion del usuario y destino final desde BigQuery
 query = """
@@ -19,57 +24,33 @@ WHERE id = 1
 query_job = client.query(query)
 rows = query_job.result()
 
+# Prueba introduccion datos posicion
+#Taxi_lat = "39.49812487550294"
+#Taxi_lng = "-0.3436109452203315"
+#Userinit_lat = "39.46674308189089"
+#Userinit_lng = "-0.3545383831836688"
+#Userfinal_lat = "39.50394308189089"
+#Userfinal_lng = "-0.3865383831836688"
+
 # Especifica las coordenadas de origen, ubicacion usuario y destino
-origin = "row.Taxi_lat, row.Taxi_lng"
-destinationinit = "row.Userinit_lat, row.Userinit_lng"
-destinationfinal = "row.Userfinal_lat, row.Userfinal_lng"
+taxi_position = "row.Taxi_lat, row.Taxi_lng"
+user_position  = "row.Userinit_lat, row.Userinit_lng"
+user_destination = "row.Userfinal_lat, row.Userfinal_lng"
 
-# Se introduce la API_KEY de Google Maps
-
-API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'  
-urlinit = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destinationinit}&key={API_KEY}"
-urlfinal = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={destinationinit}&destinations={destinationfinal}&key={API_KEY}"
-
-# Reemplaza las coordenadas en las URLs para la posicion del taxi hasta la posicion de usuario y destino final
-urlinit = urlinit.format(origin=origin, destinationinit=destinationinit, API_KEY="{API_KEY}")
-urlfinal = urlfinal.format(destinationinit=destinationinit, destinationfinal=destinationfinal, API_KEY="{API_KEY}")
+# Introducir la API_KEY de Google Maps
+API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 # Realiza una solicitud a la API de Google Maps
-responseinit = requests.get(urlinit)
-responsefinal = requests.get(urlfinal)
+gmaps = googlemaps.Client(key=API_KEY) 
 
-# Verifica si la solicitud es correcta
-if responseinit.status_code == 200:
-    # Convierte las respuesta a un diccionario de Python
-    datainit = responseinit.json()
+# Obtiene la distancia en metros al usuario y la imprime
+resultinit = gmaps.distance_matrix(taxi_position, user_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+print('El trayecto del taxi a la posicion del usuario es:',resultinit, 'mts')
 
-    # Obtiene la distancia en metros al usuario
-    Distance_user = datainit["rows"][0]["elements"][0]["distance"]["value"]
+# Obtiene la distancia en metros al destino y la imprime
+resultfinal = gmaps.distance_matrix(user_position, user_destination, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+print('El trayecto desde el usuario al destino es:',resultfinal, 'mts')
 
-    # Imprime la distancia al usuario
-    print("La distancia a la posicion del usuario es de {} metros".format(distance_user))
-
-else:
-    # Imprime un mensaje de error si la solicitud falla
-    print("Error al hacer una solicitud de la posicion del usuario a la API de Google Maps")
-
-# Verifica si la solicitud es correcta
-if responsefinal.status_code == 200:
-    # Convierte las respuesta a un diccionario de Python
-    datafinal = responsefinal.json()
-
-    # Obtiene la distancia en metros al destino
-    Distance_destination = datafinal["rows"][0]["elements"][0]["distance"]["value"]
-
-       # Imprime la distancia al destino desde la posicion del usuario
-    print("La distancia a la posicion del usuario al destino final es de {} metros".format(distance_destination))
-
-else:
-    # Imprime un mensaje de error si la solicitud falla
-    print("Error al hacer una solicitud del destino final del usuario a la API de Google Maps")
-
-# Obtiene la distancia total en metros
-Distance_total = Distance_user + Distance_destination
-
-# Imprime la distancia al total
-print("La distancia total es de {} metros".format(Distance_total))
+# Obtiene la distancia total en metros y la imprime
+distancia_total = resultinit + resultfinal
+print('El trayecto total es:',distancia_total, 'mts')
