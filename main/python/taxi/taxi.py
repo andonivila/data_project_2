@@ -75,8 +75,8 @@ def generatedata():
     data['taxi_id'] = user_id
     data['taxi_prefered_payment_method'] = payment_method
     data["taxi_phone_number"]=phone_number
-    data["location_lat"]=position
-    data["location_long"]=position
+    data["taxi_location_lat"]=position
+    data["taxi_location_long"]=position
 
     return data
 

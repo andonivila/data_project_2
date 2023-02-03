@@ -54,10 +54,10 @@ phone_number = generate_phone_number()
 email = fake.email()
 
 # Genarating random location data for Valencia
-init_location_lat = random.uniform(39.4, 39.5)
-init_location_long = random.uniform(-0.4, -0.3)
-final_location_lat = random.uniform(39.4, 39.5)
-final_location_long = random.uniform(-0.4, -0.3)
+init_location_lat = str(random.uniform(39.4, 39.5))
+init_location_long = str(random.uniform(-0.4, -0.3))
+final_location_lat = str(random.uniform(39.4, 39.5))
+final_location_long = str(random.uniform(-0.4, -0.3))
 
 
 payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
