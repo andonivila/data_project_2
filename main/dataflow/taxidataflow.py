@@ -122,6 +122,9 @@ def run_pipeline():
             write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
         )
+
+        ###Step03: Merge Data from taxi and user topics
+        
         
     
 
