@@ -9,8 +9,6 @@ import logging
 
 fake = Faker()
 
-user_id=os.getenv('USER_ID')
-topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
@@ -47,7 +45,13 @@ def generate_phone_number():
   phone_number = country_code + " " + primer_numero + segundos_3_digits + terceros_3_digits
   return phone_number
 
+def generate_user_id():
+    letters_and_digits = string.ascii_letters + string.digits
+    user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
+    return user_id
+
 # Generating random data
+user_id = generate_user_id()
 name = fake.name()
 phone_number = generate_phone_number()
 email = fake.email()

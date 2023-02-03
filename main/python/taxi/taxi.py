@@ -6,6 +6,7 @@ from faker import Faker
 import datetime
 from google.cloud import pubsub_v1
 import logging
+import string
 
 
 ###########################
@@ -16,8 +17,6 @@ import logging
 fake = Faker()
 
 # Initial variables
-user_id=os.getenv('USER_ID')
-topic_id=os.getenv('TOPIC_ID')
 time_lapse=int(os.getenv('TIME_ID'))
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-7ec597825415.json" 
 
@@ -44,17 +43,13 @@ class PubSubMessages:
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
-# Genarate a random location in Valencia
-def generate_random_position():
-    latitude = random.uniform(39.4, 39.5)
-    longitude = random.uniform(-0.4, -0.3)
-    return (latitude, longitude)
 
 #Generate a random Spanish phone number
 def generate_phone_number():
   country_code = "+34"
   primer_numero = str(6)
 
+# Random lat and random long in Valencia
   segundos_3_digits = str(random.randint(1, 9999)).zfill(3)
   terceros_3_digits = str(random.randint(1, 9999)).zfill(3)
 
@@ -62,21 +57,25 @@ def generate_phone_number():
   phone_number = country_code + " " + primer_numero + segundos_3_digits + terceros_3_digits
   return phone_number
 
+def generate_user_id():
+    letters_and_digits = string.ascii_letters + string.digits
+    user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
+    return user_id
 
 # Taxi data declaration
+taxi_id = generate_user_id()
 phone_number = generate_phone_number()
-position = generate_random_position()
 payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 
 # Generate Data function
 def generatedata():
 
     data={}
-    data['taxi_id'] = user_id
+    data['taxi_id'] = taxi_id
     data['taxi_prefered_payment_method'] = payment_method
     data["taxi_phone_number"]=phone_number
-    data["taxi_location_lat"]=position
-    data["taxi_location_long"]=position
+    data["taxi_location_lat"]= random.uniform(39.4, 39.5)
+    data["taxi_location_long"]= random.uniform(-0.4, -0.3)
 
     return data
 
