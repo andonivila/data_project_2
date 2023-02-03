@@ -6,7 +6,6 @@ from faker import Faker
 import datetime
 from google.cloud import pubsub_v1
 import logging
-import argparse
 
 
 ###########################
@@ -74,11 +73,10 @@ def generatedata():
 
     data={}
     data['taxi_id'] = user_id
-    data['prefered_payment_method'] = payment_method
-    data["phone_number"]=phone_number
-    data["location"]=position
-    data["timestamp"] = str(datetime.datetime.now())
-
+    data['taxi_prefered_payment_method'] = payment_method
+    data["taxi_phone_number"]=phone_number
+    data["location_lat"]=position
+    data["location_long"]=position
 
     return data
 

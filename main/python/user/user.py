@@ -65,17 +65,15 @@ payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 def generatedata():
 
     data={}
-    data["userid"]= user_id
+    data["user_id"]= user_id
     data["user_name"]= name
-    data["phone_number"]= phone_number
-    data["email"]= email
-    data["init_location_lat"]= init_location_lat
-    data["init_location_long"]= init_location_long
-    data["final_location_lat"]= final_location_lat
-    data["final_location_long"]= final_location_long
+    data["user_phone_number"]= phone_number
+    data["user_email"]= email
+    data["user_init_location_lat"]= init_location_lat
+    data["user_init_location_long"]= init_location_long
+    data["user_final_location_lat"]= final_location_lat
+    data["user_final_location_long"]= final_location_long
     data["payment_method"]= payment_method
-    data["timestamp"] = str(datetime.datetime.now())
-
 
     return data
 
