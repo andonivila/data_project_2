@@ -1,0 +1,24 @@
+{
+    "fields": [
+    {
+        "mode": "NULLABLE",
+        "name": "User_id",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Taxi_Id",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Precio",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Numero_telf_taxi",
+        "type": "STRING"
+    }
+    ]
+}
