@@ -135,15 +135,15 @@ def run_pipeline():
         user_data = (
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
-                |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+                |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add User Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
-                |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+                |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add user Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
