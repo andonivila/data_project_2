@@ -57,6 +57,11 @@
     },
     {
         "mode": "NULLABLE",
+        "name": "Userfinal_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
         "name": "Distance_user",
         "type": "STRING"
     },
@@ -67,12 +72,7 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance_total",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "Distancetotal",
+        "name": "Total_distance",
         "type": "NUMERIC"
     }
     ]
