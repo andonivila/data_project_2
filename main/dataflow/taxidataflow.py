@@ -113,7 +113,6 @@ def run_pipeline():
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
 
-    parser.add_argument('--hostname', required=True, help='API Hostname provided during the session.')
     parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
     parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.')
 
