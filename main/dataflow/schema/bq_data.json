@@ -2,98 +2,78 @@
     "fields": [
     {
         "mode": "NULLABLE",
-        "name": "user_id",
+        "name": "User_id",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "user_name",
+        "name": "Taxi_id",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "user_phone_number",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_email",
-        "type": "TIMESTAMP"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_init_location_lat",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_init_location_long",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_final_location_lat",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_final_location_long",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "payment_method",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_id",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_prefered_payment_method",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_phone_number",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_location_lat",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_location_long",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "Final_Distance",
+        "name": "Transaction_amount",
         "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
-        "name": "Transaction_Amount",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "Operation_Id",
+        "name": "Payment_method",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
         "name": "Operation_timestamp",
+        "type": "TIMESTAMP"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Operation_id",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Processing_Time",
+        "name": "Taxi_lat",
         "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Taxi_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Userinit_lat",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Userinit_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Userfinal_lat",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Userfinal_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Distance_user",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Distance_destination",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "Total_distance",
+        "type": "NUMERIC"
     }
     ]
 }
