@@ -163,13 +163,13 @@ def run_pipeline():
 
         ###Step05: Get the closest driver for the user per Window
 
-        (
-           data 
-                |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-                |"Call Googlme maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
-                |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-        )
+        # (
+        #    data 
+        #         |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+        #         |"Call Googlme maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
+        #         |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+        #         |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+        # )
         
 
 
