@@ -73,10 +73,10 @@ def generatedata():
     data["user_name"]= name
     data["user_phone_number"]= phone_number
     data["user_email"]= email
-    data["user_init_location_lat"]= init_location_lat
-    data["user_init_location_long"]= init_location_long
-    data["user_final_location_lat"]= final_location_lat
-    data["user_final_location_long"]= final_location_long
+    data["Userinit_lat"]= init_location_lat
+    data["Userinit_lng"]= init_location_long
+    data["Userfinal_lat"]= final_location_lat
+    data["Userfinal_lng"]= final_location_long
     data["payment_method"]= payment_method
 
     return data

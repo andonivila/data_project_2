@@ -11,6 +11,7 @@ from apache_beam.transforms.combiners import MeanCombineFn
 from apache_beam.transforms.combiners import CountCombineFn
 from apache_beam.transforms.core import CombineGlobally
 import apache_beam.transforms.window as window
+import googlemaps
 
 from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
 from apache_beam.io.gcp import bigquery_tools
@@ -57,7 +58,19 @@ class AddTimestampDoFn(beam.DoFn):
 
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
-        yield ['Userinit_lat', 'Userinit_lng', 'Taxi_lat','Taxi_lng','Userfinal_lat','Userfinal_lng']
+        yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'user_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
+
+class calculateDistancesDoFn(beam.DoFn):
+    def process(self, element):
+
+        taxi_lat = element['Taxi_lat']
+        taxi_long = element['Taxi_lng']
+        user_init_lat = element['Userinit_lat']
+        user_init_long = element['Userinit_lng']
+        user_final_lat = element['Userfinal_lat']
+        user_final_long = element['Userfinal_lng']
+
+
 
 
 '''Dataflow Process'''
@@ -90,19 +103,19 @@ def run_pipeline():
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
         data = (user_data, taxi_data) | beam.Flatten()
-
-        ###Step03: Add processing timestamp
 
         ###Step04: Write combined data to BigQuery
         (
@@ -114,11 +127,13 @@ def run_pipeline():
             )
         )
 
-        ###Step05: Claculate distance between taxi and initial user loc and get the closest. User leads in the processing window
+        ###Step05: Get the closest driver for the user per Window
 
         (
            data 
                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+                |"Call Googlme maps API to calculate distances" >> beam.ParDo(calculateDistancesDoFn())
         )
         
 

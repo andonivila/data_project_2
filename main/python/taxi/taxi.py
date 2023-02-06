@@ -74,8 +74,8 @@ def generatedata():
     data['taxi_id'] = taxi_id
     data['taxi_prefered_payment_method'] = payment_method
     data["taxi_phone_number"]=phone_number
-    data["taxi_location_lat"]= random.uniform(39.4, 39.5)
-    data["taxi_location_long"]= random.uniform(-0.4, -0.3)
+    data["Taxi_lat"]= random.uniform(39.4, 39.5)
+    data["Taxi_lng"]= random.uniform(-0.4, -0.3)
 
     return data
 
