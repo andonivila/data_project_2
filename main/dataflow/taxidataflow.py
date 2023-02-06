@@ -59,12 +59,12 @@ class MatchShortestDistance(beam.PTransform):
     def _find_closest_match(self, group_key, group_values):
         
         # User leads the window
-        user_id = group_key
-        taxi_id, distances = zip(*group_values)
+        User_id = group_key
+        Taxi_id, distances = zip(*group_values)
         shortest_distance = min(distances)
         closest_taxi_index = distances.index(shortest_distance)
 
-        return (user_id, (taxi_id[closest_taxi_index], shortest_distance))
+        return (User_id, (Taxi_id[closest_taxi_index], shortest_distance))
 
 
 '''DoFn Classes'''
@@ -81,7 +81,7 @@ class AddTimestampDoFn(beam.DoFn):
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
-        yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'user_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
+        yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'User_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
 
 class calculateDistancesDoFn(beam.DoFn):
     def process(self, element):
