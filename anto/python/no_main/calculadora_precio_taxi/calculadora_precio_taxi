@@ -1,15 +1,17 @@
+
 def cal_prec_taxi(km_del_viaje):
     prec_km_dia= 1.09
     prec_km_noche= 1.19
     bandera_dia= 4
     bandera_noche= 6,50
     
+    
 
     #Tarifa  dia = 08:00AM / 20:00PM
     #Tarifa noche = 21:00PM / 07:00AM
 
 
-    if #timestamp == dia:
+    if 
         precio = bandera_dia + (prec_km_dia*km_del_viaje)
     else :
         precio = bandera_noche + (prec_km_noche*km_del_viaje)
