@@ -67,12 +67,12 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance_user",
+        "name": "Distance_to_user",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance_destination",
+        "name": "Distance_to_destination",
         "type": "NUMERIC"
     },
     {
