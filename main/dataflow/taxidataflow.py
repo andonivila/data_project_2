@@ -11,6 +11,7 @@ from apache_beam.transforms.combiners import MeanCombineFn
 from apache_beam.transforms.combiners import CountCombineFn
 from apache_beam.transforms.core import CombineGlobally
 import apache_beam.transforms.window as window
+from apache_beam.transforms import util
 import googlemaps
 
 from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
@@ -28,6 +29,7 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
+API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 '''Functions'''
 def ParsePubSubMessage(message):
@@ -42,7 +44,27 @@ def ParsePubSubMessage(message):
 
 
 '''PTransform Classes'''
+ 
+class MatchShortestDistance(beam.PTransform):
 
+    def __init__(self):
+        super().__init__()
+
+    def expand(self, pcoll):
+        return (pcoll
+                | util.group_by_key()
+                | util.Map(self._find_closest_match)
+                )
+
+    def _find_closest_match(self, group_key, group_values):
+        
+        # User leads the window
+        user_id = group_key
+        taxi_id, distances = zip(*group_values)
+        shortest_distance = min(distances)
+        closest_taxi_index = distances.index(shortest_distance)
+
+        return (user_id, (taxi_id[closest_taxi_index], shortest_distance))
 
 
 '''DoFn Classes'''
@@ -56,6 +78,7 @@ class AddTimestampDoFn(beam.DoFn):
         element['Processing_Time'] = str(datetime.now())
         yield element
 
+#DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
         yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'user_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
@@ -63,15 +86,26 @@ class getLocationsDoFn(beam.DoFn):
 class calculateDistancesDoFn(beam.DoFn):
     def process(self, element):
 
+        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
+
         taxi_lat = element['Taxi_lat']
         taxi_long = element['Taxi_lng']
         user_init_lat = element['Userinit_lat']
         user_init_long = element['Userinit_lng']
-        user_final_lat = element['Userfinal_lat']
-        user_final_long = element['Userfinal_lng']
+        #user_final_lat = element['Userfinal_lat']
+        #user_final_long = element['Userfinal_lng']
 
+        taxi_position = taxi_lat, taxi_long
+        user_intit_position = user_init_lat, user_init_long
+        #user_destination = user_final_lat, user_final_long
 
+        # Realiza una solicitud a la API de Google Maps
+        gmaps = googlemaps.Client(key=API_KEY) 
 
+        # Accedemos al elemento distance del JSON rebido
+        element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+        yield element['init_distance']
 
 '''Dataflow Process'''
 def run_pipeline():
@@ -132,8 +166,9 @@ def run_pipeline():
         (
            data 
                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                |"Call Googlme maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-                |"Call Googlme maps API to calculate distances" >> beam.ParDo(calculateDistancesDoFn())
+                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
         )
         
 

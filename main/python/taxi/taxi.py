@@ -57,6 +57,7 @@ def generate_phone_number():
   phone_number = country_code + " " + primer_numero + segundos_3_digits + terceros_3_digits
   return phone_number
 
+# Genarate random 8 digit user_id
 def generate_user_id():
     letters_and_digits = string.ascii_letters + string.digits
     user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
