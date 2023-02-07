@@ -134,6 +134,18 @@ class RemoveLocations(beam.DoFn):
         yield element['user_id', 'taxi_id', 'init_distance', 'final_distance']
 
 
+#DoFn06: Calculating final distance
+class AddFinalDistanceDoFn(beam.DoFn):
+    def process(self, element):
+        element['total_distance'] = element['init_distance'] + element['final_distance']
+
+        yield element
+
+# class CalculateTransactionAmount(beam.DoFn):
+#     def process(self, element):
+        
+
+
 '''Dataflow Process'''
 def run_pipeline():
 
@@ -186,6 +198,8 @@ def run_pipeline():
                  |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
                  |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
                  |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+                 |"Calculate total distance" >> beam.ParDo(AddFinalDistanceDoFn())
+                 |"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
          )
 
 
