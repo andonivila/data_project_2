@@ -128,6 +128,11 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
 
         yield element
 
+#DoFn05: Removing locations from data once init and final distances are calculated
+class RemoveLocations(beam.DoFn):
+    def process(self, element):
+        yield element['user_id', 'taxi_id', 'init_distance', 'final_distance']
+
 
 '''Dataflow Process'''
 def run_pipeline():
@@ -172,7 +177,20 @@ def run_pipeline():
         # Here we have taxi and user data in the same  table
         data = (user_data, taxi_data) | beam.Flatten()
 
-        ###Step04: Write combined data to BigQuery
+        ###Step05: Get the closest driver for the user per Window
+        (
+            data 
+                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
+                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+         )
+
+
+
+         ###Step06: Write combined data to BigQuery
         (
             data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{args.output_bigquery}",
@@ -181,16 +199,6 @@ def run_pipeline():
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
         )
-
-        ###Step05: Get the closest driver for the user per Window
-        (
-            data 
-                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
-                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-         )
         
 
 
