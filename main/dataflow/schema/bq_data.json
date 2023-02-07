@@ -2,92 +2,92 @@
     "fields": [
     {
         "mode": "NULLABLE",
-        "name": "User_id",
+        "name": "user_id",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "User_name",
+        "name": "user_name",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "User_phone_number",
+        "name": "user_phone_number",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "User_email",
-        "type": "TIMESTAMP"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "Userinit_lat",
+        "name": "user_email",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Userinit_lng",
+        "name": "userinit_lat",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Userfinal_lat",
+        "name": "userinit_lng",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Userfinal_lng",
+        "name": "userfinal_lat",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Payment_method",
+        "name": "userfinal_lng",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Taxi_id",
+        "name": "payment_method",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Taxi_payment_method",
+        "name": "taxi_id",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Taxi_lat",
+        "name": "taxi_phone_number",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Taxi_lng",
+        "name": "taxi_lat",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance_to_user",
+        "name": "taxi_lng",
         "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "Distance_to_destination",
+        "name": "distance_to_user",
         "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
-        "name": "Total_distance",
+        "name": "distance_to_destination",
         "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
-        "name": "Transaction_Amount",
+        "name": "total_distance",
         "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
-        "name": "Operation_Id",
+        "name": "transaction_amount",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "operation_id",
         "type": "STRING"
     }
     ]
