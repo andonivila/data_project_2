@@ -51,20 +51,22 @@ class MatchShortestDistance(beam.PTransform):
         super().__init__()
 
     def expand(self, pcoll):
-        return (pcoll
+        match = (pcoll
                 | util.group_by_key()
                 | util.Map(self._find_closest_match)
                 )
 
+        return match
+
     def _find_closest_match(self, group_key, group_values):
         
         # User leads the window
-        User_id = group_key
-        Taxi_id, distances = zip(*group_values)
+        user_id = group_key
+        taxi_id, distances = zip(*group_values)
         shortest_distance = min(distances)
         closest_taxi_index = distances.index(shortest_distance)
 
-        return (User_id, (Taxi_id[closest_taxi_index], shortest_distance))
+        return (user_id, (taxi_id[closest_taxi_index], shortest_distance))
 
 
 '''DoFn Classes'''
@@ -75,15 +77,17 @@ class AddTimestampDoFn(beam.DoFn):
     #Process function to deal with data
     def process(self, element):
         #Add Processing time field
-        element['Processing_Time'] = str(datetime.now())
+        element['processing_time'] = str(datetime.now())
         yield element
 
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
-        yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'User_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
+        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
 
-class calculateDistancesDoFn(beam.DoFn):
+
+#DoFn03: Calculate distance between user init location and taxi
+class CalculateInitDistancesDoFn(beam.DoFn):
     def process(self, element):
 
         # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
@@ -165,7 +169,7 @@ def run_pipeline():
         # (
         #    data 
         #         |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-        #         |"Call Googlme maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
+        #         |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
         #         |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
         #         |"Get shortest distance between user and taxis" >> MatchShortestDistance()
         # )
