@@ -71,6 +71,8 @@ def generatedata():
     data["taxi_phone_number"] = phone_number
     data["taxi_lat"] = taxi_lat
     data["taxi_lng"] = taxi_long
+    data["taxibase_fare"] = 4.00
+    data["taxikm_fare"] = 1.09
 
     return data
 

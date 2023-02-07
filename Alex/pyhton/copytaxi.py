@@ -8,16 +8,16 @@ import logging
 import string
 
 ###########################
-### USER DATA GENERATOR ###
+### TAXI DATA GENERATOR ###
 ###########################
 
 fake = Faker()
 
 # Initial variables
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-7ec597825415.json" 
 
 project_id = "data-project-2-376316"
-topic_name = "user_position"
+topic_name = "taxi_position"
 
 ## PUB/SUB class declaration
 class PubSubMessages:
@@ -32,7 +32,7 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new user is looking for a taxi. Id: %s", message['user_id'])
+        logging.info("A new taxi is available. Id: %s", message['taxi_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
@@ -55,8 +55,7 @@ def generate_user_id():
     
     return user_id
 
-# Generating user random data
-
+# Taxi data declaration
 
 # Generating random location data for Valencia
 
@@ -64,15 +63,12 @@ def generate_user_id():
 def generatedata():
 
     data={}
-    data["user_id"] = generate_user_id()
-    data["user_name"] = fake.name()
-    data["user_phone_number"] = generate_phone_number()
-    data["user_email"] = fake.email()
-    data["userinit_lat"] = str(random.uniform(39.4, 39.5))
-    data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
-    data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
-    data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
-    data["payment_method"] = random.choice(['Credit card', 'Paypal', 'Cash'])
+    data['taxi_id'] = generate_user_id()
+    data["taxi_phone_number"] = generate_phone_number()
+    data["taxi_lat"] = str(random.uniform(39.4, 39.5))
+    data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
+    data["taxibase_fare"] = 4.00
+    data["taxikm_fare"] = 1.09
 
     return data
 
@@ -95,5 +91,5 @@ def senddata(project_id, topic_name):
         pubsub_class.__exit__()
     
 if __name__ == "__main__":
-        logging.getLogger().setLevel(logging.INFO)
+        logging.getLogger().setLevel(logging.INFO) 
         senddata(project_id, topic_name)
