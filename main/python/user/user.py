@@ -55,32 +55,19 @@ def generate_user_id():
     
     return user_id
 
-# Generating user random data
-user_id = generate_user_id()
-name = fake.name()
-phone_number = generate_phone_number()
-email = fake.email()
-payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
-
-# Generating random location data for Valencia
-init_location_lat = str(random.uniform(39.4, 39.5))
-init_location_long = str(random.uniform(-0.4, -0.3))
-final_location_lat = str(random.uniform(39.4, 39.5))
-final_location_long = str(random.uniform(-0.4, -0.3))
-
 # Generate data function
 def generatedata():
 
     data={}
-    data["user_id"] = user_id
-    data["user_name"] = name
-    data["user_phone_number"] = phone_number
-    data["user_email"] = email
-    data["userinit_lat"] = init_location_lat
-    data["userinit_lng"] = init_location_long
-    data["userfinal_lat"] = final_location_lat
-    data["userfinal_lng"] = final_location_long
-    data["payment_method"] = payment_method
+    data["user_id"] = generate_user_id()
+    data["user_name"] = fake.name()
+    data["user_phone_number"] = generate_phone_number()
+    data["user_email"] = fake.email()
+    data["userinit_lat"] = str(random.uniform(39.4, 39.5))
+    data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
+    data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
+    data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
+    data["payment_method"] = random.choice(['Credit card', 'Paypal', 'Cash'])
 
     return data
 
