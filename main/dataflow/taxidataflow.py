@@ -128,7 +128,7 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
         user_destination = user_final_lat, user_final_long
 
         # Realiza una solicitud a la API de Google Maps
-        gmaps = googlemaps.Client(key=API_KEY) 
+        gmaps = googlemaps.Client(key=clv_gm) 
 
         # Accedemos al elemento distance del JSON rebido
         element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
