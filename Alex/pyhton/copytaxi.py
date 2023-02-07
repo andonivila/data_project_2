@@ -56,13 +56,10 @@ def generate_user_id():
     return user_id
 
 # Taxi data declaration
-taxi_id = generate_user_id()
-phone_number = generate_phone_number()
 
 # Generating random location data for Valencia
 
 # Generate data function
-
 def generatedata():
 
     data={}
@@ -70,6 +67,8 @@ def generatedata():
     data["taxi_phone_number"] = generate_phone_number()
     data["taxi_lat"] = str(random.uniform(39.4, 39.5))
     data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
+    data["taxibase_fare"] = 4.00
+    data["taxikm_fare"] = 1.09
 
     return data
 
