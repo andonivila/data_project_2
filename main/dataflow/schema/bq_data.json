@@ -72,7 +72,7 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "distance_to_destination",
+        "name": "distance_destination",
         "type": "NUMERIC"
     },
     {
