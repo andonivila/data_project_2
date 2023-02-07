@@ -107,3 +107,213 @@ En cambio ".ParDo" para tareas más complejas y que requieren un control más fi
 
 En nuestro caso se va a utilizar "ParDo" con el fin de tener un mayor control y por ello las clases serán creadas con "beam.DoFn" como veremos más adelante
 
+## Clases 
+```python
+class AddTimestampDoFn(beam.DoFn):
+
+    #Process function to deal with data
+    def process(self, element):
+        #Add Processing time field
+        element['Processing_Time'] = str(datetime.now())
+        yield element
+``` 
+En este caso la función hara referencia a que se modificará el type de la variable element en su columna "Porcessing time" por una de carácter string
+
+```python
+#DoFn02: Get the location fields
+class getLocationsDoFn(beam.DoFn):
+    def process(self, element):
+        
+        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
+```
+
+Mediante esta función, nos devolvería cual sería la posición geográfica tanto del taxi como del usario
+
+``` python
+class CalculateInitDistancesDoFn(beam.DoFn):
+    def process(self, element):
+
+        taxi_lat = element['taxi_lat']
+        taxi_long = element['taxi_lng']
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
+
+        taxi_position = taxi_lat, taxi_long
+        user_intit_position = user_init_lat, user_init_long
+
+        # Realiza una solicitud a la A.P.I. de Google Maps
+        gmaps = googlemaps.Client(key=clv_gm) 
+
+        # Accedemos al elemento distance del JSON recibido
+        element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+        yield element
+```
+
+Con esta función conseguiremos calcular cuál es la distancia entre el usuairo y el taxi. Más adelante se verá como no es únicamente medirá la distancia de un usuario a un taxi, si no que recogerá la ubicación de todos los taxis y calculará la distancia con la API de Google Maps que es la siguiente clase:
+
+``` python
+class CalculateFinalDistancesDoFn(beam.DoFn):
+    def process(self, element):
+
+        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
+        user_final_lat = element['Userfinal_lat']
+        user_final_long = element['Userfinal_lng']
+
+        
+        user_intit_position = user_init_lat, user_init_long
+        user_destination = user_final_lat, user_final_long
+
+        # Realiza una solicitud a la API de Google Maps
+        gmaps = googlemaps.Client(key=clv_gm) 
+
+        # Accedemos al elemento distance del JSON rebido
+        element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+        yield element
+```
+Una vez se haya calculado la distancia y guardada como una clave más, se procederá a eliminar las posiciones geográficas de los taxis, así como los usuarios ya que no son necearias
+
+De esa manera conseguiremos obtener finalmente en "BigQuery" únicamente los datos realmente útiles.
+
+``` python
+class RemoveLocations(beam.DoFn):
+    def process(self, element):
+        yield element['user_id', 'taxi_id', 'init_distance', 'final_distance']
+```
+
+## DATAFLOW PROCESS
+```python
+def run_pipeline():
+
+    # Input arguments
+    parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
+
+    parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
+    parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.')
+
+    args, pipeline_opts = parser.parse_known_args()
+
+    #Load schema from /schema folder 
+    with open(args.bigquery_schema_path) as file:
+            input_schema = json.load(file)
+
+    schema = bigquery_tools.parse_table_schema_from_json(json.dumps(input_schema))
+
+    ### Apache Beam Pipeline
+    #Pipeline options
+    options = PipelineOptions(pipeline_opts, save_main_session = True, streaming = True, project = project_id)
+
+    #Pipeline
+    with beam.Pipeline(argv=pipeline_opts, options=options) as p:
+
+        ###Step01: Read user and taxi data from PUB/SUB
+        user_data = (
+            p 
+                |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
+                |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add User Processing Time" >> beam.ParDo(AddTimestampDoFn())
+        )
+
+        taxi_data = (
+            p
+                |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
+                |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Add Taxi Processing Time" >> beam.ParDo(AddTimestampDoFn())
+        )
+
+        ###Step02: Merge Data from taxi and user topics into one PColl
+        # Here we have taxi and user data in the same  table
+        data = (user_data, taxi_data) | beam.Flatten()
+
+        ###Step05: Get the closest driver for the user per Window
+        (
+            data 
+                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
+                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+         )
+
+
+
+         ###Step06: Write combined data to BigQuery
+        (
+            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+                table = f"{project_id}:{args.output_bigquery}",
+                schema = schema,
+                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+            )
+        )
+        
+
+```
+Este código es un ejemplo de un pipeline de Apache Beam para procesar datos en tiempo real. Se trata de un pipeline de flujo de datos en tiempo real para integrar datos de usuarios y taxis.
+
+Linea por linea:
+```python
+def run_pipeline(): #se define una función llamada run_pipeline que ejecutará el pipeline de Apache Beam.
+```
+
+```python
+parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
+
+#Se crea un analizador de argumentos utilizando la biblioteca argparse para obtener los argumentos necesarios para el pipeline.
+
+```
+
+```python
+parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.') 
+
+#Se agrega un argumento llamado output_bigquery que es obligatorio y proporciona la tabla de destino en BigQuery donde se almacenarán los datos. El formato de la tabla es <dataset>.<table>.
+```
+```python
+parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.') 
+
+#Se agrega otro argumento llamado bigquery_schema_path que es obligatorio y proporciona la ruta del esquema de BigQuery dentro del repositorio.
+```
+
+``` python
+args, pipeline_opts = parser.parse_known_args() 
+
+#Se llama a parser.parse_known_args() para obtener los argumentos conocidos y las opciones del pipeline.
+```
+
+```python
+with open(args.bigquery_schema_path) as file: 
+    
+#Se abre el archivo con la ruta especificada por el argumento bigquery_schema_path.
+```
+
+``` python
+input_schema = json.load(file) 
+
+#Se carga el esquema en formato JSON del archivo.
+```
+
+
+``` python
+schema = bigquery_tools.parse_table_schema_from_json(json.dumps(input_schema)) 
+
+S#e procesa el esquema utilizando la función parse_table_schema_from_json de la biblioteca bigquery_tools.
+```
+``` python
+options = PipelineOptions(pipeline_opts, save_main_session = True, streaming = True, project = project_id) 
+
+#Se crean las opciones del pipeline especificando que se trata de un pipeline en tiempo real y el ID del proyecto.
+```
+``` python
+with beam.Pipeline(argv=pipeline_opts, options=options) as p: 
+
+#Se inicia el pipeline de Apache Beam.
+```
+``` python
+user_data = (p |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True) 
+
+#Se crea una PCollection llamada
+```
