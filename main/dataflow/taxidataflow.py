@@ -24,21 +24,26 @@ import json
 import logging
 import requests
 
-# Initial variables
+#Initial variables
 project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
-API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+
+#Indicamos clave Google Maps
+clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 '''Functions'''
 def ParsePubSubMessage(message):
     #Decode PubSub message in order to deal with
     pubsubmessage = message.data.decode('utf-8')
+
     #Convert string decoded in json format(element by element)
     row = json.loads(pubsubmessage)
+
     #Logging
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
+
     #Return function
     return row
 
@@ -51,20 +56,22 @@ class MatchShortestDistance(beam.PTransform):
         super().__init__()
 
     def expand(self, pcoll):
-        return (pcoll
+        match = (pcoll
                 | util.group_by_key()
                 | util.Map(self._find_closest_match)
                 )
 
+        return match
+
     def _find_closest_match(self, group_key, group_values):
         
         # User leads the window
-        User_id = group_key
-        Taxi_id, distances = zip(*group_values)
+        user_id = group_key
+        taxi_id, distances = zip(*group_values)
         shortest_distance = min(distances)
         closest_taxi_index = distances.index(shortest_distance)
 
-        return (User_id, (Taxi_id[closest_taxi_index], shortest_distance))
+        return (user_id, (taxi_id[closest_taxi_index], shortest_distance))
 
 
 '''DoFn Classes'''
@@ -75,37 +82,64 @@ class AddTimestampDoFn(beam.DoFn):
     #Process function to deal with data
     def process(self, element):
         #Add Processing time field
-        element['Processing_Time'] = str(datetime.now())
+        element['processing_time'] = str(datetime.now())
+        
         yield element
 
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
-        yield element['Taxi_id', 'Taxi_lat', 'Taxi_lng', 'User_id', 'Userinit_lat', 'Userinit_lng', 'Userfinal_lat', 'Userfinal_lng']
+        
+        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
 
-class calculateDistancesDoFn(beam.DoFn):
+
+#DoFn03: Calculate distance between user init location and taxi
+class CalculateInitDistancesDoFn(beam.DoFn):
     def process(self, element):
 
-        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
-
-        taxi_lat = element['Taxi_lat']
-        taxi_long = element['Taxi_lng']
-        user_init_lat = element['Userinit_lat']
-        user_init_long = element['Userinit_lng']
-        #user_final_lat = element['Userfinal_lat']
-        #user_final_long = element['Userfinal_lng']
+        taxi_lat = element['taxi_lat']
+        taxi_long = element['taxi_lng']
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
 
         taxi_position = taxi_lat, taxi_long
         user_intit_position = user_init_lat, user_init_long
-        #user_destination = user_final_lat, user_final_long
 
-        # Realiza una solicitud a la API de Google Maps
-        gmaps = googlemaps.Client(key=API_KEY) 
+        # Realiza una solicitud a la A.P.I. de Google Maps
+        gmaps = googlemaps.Client(key=clv_gm) 
 
-        # Accedemos al elemento distance del JSON rebido
+        # Accedemos al elemento distance del JSON recibido
         element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
-        yield element['init_distance']
+        yield element
+
+#DoFn04: Calculate final distance between user init location and user final location
+class CalculateFinalDistancesDoFn(beam.DoFn):
+    def process(self, element):
+
+        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
+        user_final_lat = element['Userfinal_lat']
+        user_final_long = element['Userfinal_lng']
+
+        
+        user_intit_position = user_init_lat, user_init_long
+        user_destination = user_final_lat, user_final_long
+
+        # Realiza una solicitud a la API de Google Maps
+        gmaps = googlemaps.Client(key=clv_gm) 
+
+        # Accedemos al elemento distance del JSON rebido
+        element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+        yield element
+
+#DoFn05: Removing locations from data once init and final distances are calculated
+class RemoveLocations(beam.DoFn):
+    def process(self, element):
+        yield element['user_id', 'taxi_id', 'init_distance', 'final_distance']
+
 
 '''Dataflow Process'''
 def run_pipeline():
@@ -150,7 +184,20 @@ def run_pipeline():
         # Here we have taxi and user data in the same  table
         data = (user_data, taxi_data) | beam.Flatten()
 
-        ###Step04: Write combined data to BigQuery
+        ###Step05: Get the closest driver for the user per Window
+        (
+            data 
+                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
+                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+         )
+
+
+
+         ###Step06: Write combined data to BigQuery
         (
             data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{args.output_bigquery}",
@@ -159,22 +206,7 @@ def run_pipeline():
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
         )
-
-        ###Step05: Get the closest driver for the user per Window
-
-        # (
-        #    data 
-        #         |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-        #         |"Call Googlme maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
-        #         |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-        #         |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-        # )
         
-
-
-
-        
-    
 
 if __name__ == '__main__' : 
     #Add Logs
