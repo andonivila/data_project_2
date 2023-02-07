@@ -7,9 +7,13 @@ from google.cloud import pubsub_v1
 import logging
 import string
 
+###########################
+### USER DATA GENERATOR ###
+###########################
 
 fake = Faker()
 
+# Initial variables
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
 project_id = "data-project-2-376316"
@@ -28,76 +32,76 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new user is looking for a ride. Id: %s", message['user_id'])
+        logging.info("A new user is looking for a taxi. Id: %s", message['user_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
+#Generate a random Spanish phone number
 def generate_phone_number():
   country_code = "+34"
   primer_numero = str(6)
-
   segundos_3_digits = str(random.randint(1, 9999)).zfill(3)
   terceros_3_digits = str(random.randint(1, 9999)).zfill(3)
-
-  
   phone_number = country_code + " " + primer_numero + segundos_3_digits + terceros_3_digits
+  
   return phone_number
 
+# Generate random 8 digit user_id
 def generate_user_id():
     letters_and_digits = string.ascii_letters + string.digits
     user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
+    
     return user_id
 
-# Generating random data
+# Generating user random data
 user_id = generate_user_id()
 name = fake.name()
 phone_number = generate_phone_number()
 email = fake.email()
+payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
 
-# Genarating random location data for Valencia
+# Generating random location data for Valencia
 init_location_lat = str(random.uniform(39.4, 39.5))
 init_location_long = str(random.uniform(-0.4, -0.3))
 final_location_lat = str(random.uniform(39.4, 39.5))
 final_location_long = str(random.uniform(-0.4, -0.3))
 
-
-payment_method = random.choice(['Credit card', 'Paypal', 'Cash'])
-
+# Generate data function
 def generatedata():
 
     data={}
-    data["user_id"]= user_id
-    data["user_name"]= name
-    data["user_phone_number"]= phone_number
-    data["user_email"]= email
-    data["Userinit_lat"]= init_location_lat
-    data["Userinit_lng"]= init_location_long
-    data["Userfinal_lat"]= final_location_lat
-    data["Userfinal_lng"]= final_location_long
-    data["payment_method"]= payment_method
+    data["user_id"] = user_id
+    data["user_name"] = name
+    data["user_phone_number"] = phone_number
+    data["user_email"] = email
+    data["userinit_lat"] = init_location_lat
+    data["userinit_lng"] = init_location_long
+    data["userfinal_lat"] = final_location_lat
+    data["userfinal_lng"] = final_location_long
+    data["payment_method"] = payment_method
 
     return data
 
-
+# Send the data to the PUB/SUB topic
 def senddata(project_id, topic_name):
     print(generatedata())
     pubsub_class = PubSubMessages(project_id, topic_name)
-    #Publish message into the queue every 5 seconds
+    
+    #Publish message into the queue every 10 seconds
     try:
         while True:
             message: dict =  generatedata()
             pubsub_class.publishMessages(message)
-            #it will be generated a transaction each 2 seconds
+
+            #it will be generated a transaction each 10 seconds
             time.sleep(10)
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:
         pubsub_class.__exit__()
     
-
-
 if __name__ == "__main__":
         logging.getLogger().setLevel(logging.INFO)
         senddata(project_id, topic_name)
