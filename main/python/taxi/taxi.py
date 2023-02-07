@@ -54,23 +54,17 @@ def generate_user_id():
     user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
     
     return user_id
-
-# Taxi data declaration
-taxi_id = generate_user_id()
-phone_number = generate_phone_number()
-
-# Generating random location data for Valencia
-taxi_lat = str(random.uniform(39.4, 39.5))
-taxi_long = str(random.uniform(-0.4, -0.3))
-
+    
 # Generate data function
 def generatedata():
 
     data={}
-    data['taxi_id'] = taxi_id
-    data["taxi_phone_number"] = phone_number
-    data["taxi_lat"] = taxi_lat
-    data["taxi_lng"] = taxi_long
+    data['taxi_id'] = generate_user_id()
+    data["taxi_phone_number"] = generate_phone_number()
+    data["taxi_lat"] = str(random.uniform(39.4, 39.5))
+    data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
+    data["taxibase_fare"] = 4.00
+    data["taxikm_fare"] = 1.09
 
     return data
 
