@@ -51,27 +51,20 @@ def ParsePubSubMessage(message):
 '''PTransform Classes'''
  
 class MatchShortestDistance(beam.PTransform):
-
-    def __init__(self):
-        super().__init__()
-
     def expand(self, pcoll):
         match = (pcoll
-                | util.group_by_key()
-                | util.Map(self._find_closest_match)
-                )
+                |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
+                |"Group by user_id" >> beam.GroupByKey()
+                | "Find shortest distance" >> beam.Map(lambda x: {
+                    'user_id': x[0],
+                    'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
+                    'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
+                    'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
+                })
+            )
 
         return match
-
-    def _find_closest_match(self, group_key, group_values):
         
-        # User leads the window
-        user_id = group_key
-        taxi_id, distances = zip(*group_values)
-        shortest_distance = min(distances)
-        closest_taxi_index = distances.index(shortest_distance)
-
-        return (user_id, (taxi_id[closest_taxi_index], shortest_distance))
 
 
 '''DoFn Classes'''
