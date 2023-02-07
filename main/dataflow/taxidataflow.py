@@ -24,21 +24,26 @@ import json
 import logging
 import requests
 
-# Initial variables
+#Initial variables
 project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
-API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+
+#Indicamos clave Google Maps
+clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 '''Functions'''
 def ParsePubSubMessage(message):
     #Decode PubSub message in order to deal with
     pubsubmessage = message.data.decode('utf-8')
+
     #Convert string decoded in json format(element by element)
     row = json.loads(pubsubmessage)
+
     #Logging
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
+
     #Return function
     return row
 
@@ -78,11 +83,13 @@ class AddTimestampDoFn(beam.DoFn):
     def process(self, element):
         #Add Processing time field
         element['processing_time'] = str(datetime.now())
+        
         yield element
 
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
+        
         yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
 
 
@@ -98,10 +105,10 @@ class CalculateInitDistancesDoFn(beam.DoFn):
         taxi_position = taxi_lat, taxi_long
         user_intit_position = user_init_lat, user_init_long
 
-        # Realiza una solicitud a la API de Google Maps
-        gmaps = googlemaps.Client(key=API_KEY) 
+        # Realiza una solicitud a la A.P.I. de Google Maps
+        gmaps = googlemaps.Client(key=clv_gm) 
 
-        # Accedemos al elemento distance del JSON rebido
+        # Accedemos al elemento distance del JSON recibido
         element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
         yield element
@@ -200,11 +207,6 @@ def run_pipeline():
             )
         )
         
-
-
-
-        
-    
 
 if __name__ == '__main__' : 
     #Add Logs
