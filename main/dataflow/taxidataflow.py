@@ -90,18 +90,13 @@ class getLocationsDoFn(beam.DoFn):
 class CalculateInitDistancesDoFn(beam.DoFn):
     def process(self, element):
 
-        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
-
-        taxi_lat = element['Taxi_lat']
-        taxi_long = element['Taxi_lng']
-        user_init_lat = element['Userinit_lat']
-        user_init_long = element['Userinit_lng']
-        #user_final_lat = element['Userfinal_lat']
-        #user_final_long = element['Userfinal_lng']
+        taxi_lat = element['taxi_lat']
+        taxi_long = element['taxi_lng']
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
 
         taxi_position = taxi_lat, taxi_long
         user_intit_position = user_init_lat, user_init_long
-        #user_destination = user_final_lat, user_final_long
 
         # Realiza una solicitud a la API de Google Maps
         gmaps = googlemaps.Client(key=API_KEY) 
@@ -109,7 +104,30 @@ class CalculateInitDistancesDoFn(beam.DoFn):
         # Accedemos al elemento distance del JSON rebido
         element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
-        yield element['init_distance']
+        yield element
+
+#DoFn04: Calculate final distance between user init location and user final location
+class CalculateFinalDistancesDoFn(beam.DoFn):
+    def process(self, element):
+
+        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
+        user_init_lat = element['userinit_lat']
+        user_init_long = element['userinit_lng']
+        user_final_lat = element['Userfinal_lat']
+        user_final_long = element['Userfinal_lng']
+
+        
+        user_intit_position = user_init_lat, user_init_long
+        user_destination = user_final_lat, user_final_long
+
+        # Realiza una solicitud a la API de Google Maps
+        gmaps = googlemaps.Client(key=API_KEY) 
+
+        # Accedemos al elemento distance del JSON rebido
+        element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+        yield element
+
 
 '''Dataflow Process'''
 def run_pipeline():
@@ -165,14 +183,14 @@ def run_pipeline():
         )
 
         ###Step05: Get the closest driver for the user per Window
-
-        # (
-        #    data 
-        #         |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-        #         |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(calculateDistancesDoFn())
-        #         |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-        #         |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-        # )
+        (
+            data 
+                 |"Get location fields." >> beam.ParDo(getLocationsDoFn())
+                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
+                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+         )
         
 
 
