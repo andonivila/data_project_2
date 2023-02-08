@@ -191,7 +191,7 @@ def run_pipeline():
         data = (user_data, taxi_data) | beam.Flatten()
 
         ###Step05: Get the closest driver for the user per Window
-        data = ( 
+        matched_data = ( 
             p
                  |"Get location fields." >> beam.ParDo(getLocationsDoFn())
                  |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
@@ -207,7 +207,7 @@ def run_pipeline():
 
          ###Step06: Write combined data to BigQuery
         (
-            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+            matched_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{args.output_bigquery}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
