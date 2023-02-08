@@ -1,0 +1,34 @@
+{
+    "fields": [
+    {
+        "mode": "NULLABLE",
+        "name": "user_id",
+        "type": "STRING"
+    },
+
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_id",
+        "type": "STRING"
+    },
+
+    {
+        "mode": "NULLABLE",
+        "name": "init_distance",
+        "type": "STRING"
+    },
+
+    {
+        "mode": "NULLABLE",
+        "name": "final_distance",
+        "type": "STRING"
+    },
+
+    {
+        "mode": "NULLABLE",
+        "name": "total_distance",
+        "type": "STRING"
+    }
+
+    ]
+}

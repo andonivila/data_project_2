@@ -83,7 +83,7 @@ class AddTimestampDoFn(beam.DoFn):
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
         
-        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
+        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng', 'taxibase_fare', 'taxikm_fare']
 
 
 #DoFn03: Calculate distance between user init location and taxi
@@ -193,13 +193,13 @@ def run_pipeline():
         (
             data 
                  |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateFinalDistancesDoFn())
+                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
                  |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
                  |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
                  |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
                  |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                  |"Calculate total distance" >> beam.ParDo(AddFinalDistanceDoFn())
-                 |"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
+                 #|"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
          )
 
 
