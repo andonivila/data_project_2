@@ -88,13 +88,14 @@ class getLocationsDoFn(beam.DoFn):
             element['taxi_id'],
             element['taxi_lat'], 
             element['taxi_lng'], 
+            element['taxibase_fare'], 
+            element['taxikm_fare'],
             element['user_id'], 
             element['userinit_lat'], 
             element['userinit_lng'], 
             element['userfinal_lat'], 
             element['userfinal_lng'], 
-            element['taxibase_fare'], 
-            element['taxikm_fare'])
+            )
 
 
 #DoFn03: Calculate distance between user init location and taxi
