@@ -191,8 +191,8 @@ def run_pipeline():
         data = (user_data, taxi_data) | beam.Flatten()
 
         ###Step05: Get the closest driver for the user per Window
-        data = ( 
-            p
+        (
+            data
                  |"Get location fields." >> beam.ParDo(getLocationsDoFn())
                  |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
                  |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
