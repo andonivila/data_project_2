@@ -25,13 +25,13 @@ import logging
 import requests
 
 #Initial variables
-project_id = "data-project-2-376316"
+project_id = "arctic-cursor-376010"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
 
 #Indicamos clave Google Maps
-clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+clv_gm = 'AIzaSyCcRPh8O_ifnAKOLpoLCh4VaoqhUf3napQ'
 
 '''Functions'''
 def ParsePubSubMessage(message):
