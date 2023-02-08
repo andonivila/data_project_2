@@ -191,7 +191,7 @@ def run_pipeline():
         data = (user_data, taxi_data) | beam.Flatten()
 
         ###Step05: Get the closest driver for the user per Window
-        matched_data = ( 
+        data = ( 
             p
                  |"Get location fields." >> beam.ParDo(getLocationsDoFn())
                  |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
@@ -200,20 +200,14 @@ def run_pipeline():
                  |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
                  |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                  |"Calculate total distance" >> beam.ParDo(AddFinalDistanceDoFn())
+                 |"Write to BigQuery" >> beam.io.WriteToBigQuery(
+                    table = f"{project_id}:{args.output_bigquery}",
+                    schema = schema,
+                    create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                    write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+                )
                  #|"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
          )
-
-
-
-         ###Step06: Write combined data to BigQuery
-        (
-            matched_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery}",
-                schema = schema,
-                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-            )
-        )
         
 
 if __name__ == '__main__' : 
