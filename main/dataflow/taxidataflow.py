@@ -84,7 +84,17 @@ class AddTimestampDoFn(beam.DoFn):
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
         
-        yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng', 'taxibase_fare', 'taxikm_fare']
+        yield (
+            element['taxi_id'],
+            element['taxi_lat'], 
+            element['taxi_lng'], 
+            element['user_id'], 
+            element['userinit_lat'], 
+            element['userinit_lng'], 
+            element['userfinal_lat'], 
+            element['userfinal_lng'], 
+            element['taxibase_fare'], 
+            element['taxikm_fare'])
 
 
 #DoFn03: Calculate distance between user init location and taxi
@@ -132,7 +142,12 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
 #DoFn05: Removing locations from data once init and final distances are calculated
 class RemoveLocations(beam.DoFn):
     def process(self, element):
-        yield element['user_id', 'taxi_id', 'init_distance', 'final_distance']
+        yield (
+            element['user_id'], 
+            element['taxi_id'], 
+            element['init_distance'], 
+            element['final_distance']
+        )
 
 
 #DoFn06: Calculating final distance
