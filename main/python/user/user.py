@@ -14,9 +14,9 @@ import string
 fake = Faker()
 
 # Initial variables
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="arctic-cursor-376010-87f1bcaf048d.json" 
 
-project_id = "data-project-2-376316"
+project_id = "arctic-cursor-376010"
 topic_name = "user_position"
 
 ## PUB/SUB class declaration
