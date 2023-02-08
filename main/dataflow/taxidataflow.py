@@ -57,6 +57,7 @@ class MatchShortestDistance(beam.PTransform):
                 |"Group by user_id" >> beam.GroupByKey()
                 | "Find shortest distance" >> beam.Map(lambda x: {
                     'user_id': x[0],
+                    #Aqui podemos ir sacando los campos que queramos de la PColl inicial
                     'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
                     'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
                     'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
