@@ -14,9 +14,9 @@ import string
 fake = Faker()
 
 # Initial variables
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="arctic-cursor-376010-87f1bcaf048d.json" 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
-project_id = "arctic-cursor-376010"
+project_id = "data-project-2-376316"
 topic_name = "taxi_position"
 
 ## PUB/SUB class declaration
@@ -63,8 +63,8 @@ def generatedata():
     data["taxi_phone_number"] = generate_phone_number()
     data["taxi_lat"] = str(random.uniform(39.4, 39.5))
     data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
-    data["taxibase_fare"] = 4.00
-    data["taxikm_fare"] = 1.09
+    data["taxibase_fare"] = str(4.00)
+    data["taxikm_fare"] = str(1.09)
 
     return data
 

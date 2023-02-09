@@ -14,9 +14,9 @@ import string
 fake = Faker()
 
 # Initial variables
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="arctic-cursor-376010-87f1bcaf048d.json" 
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
-project_id = "arctic-cursor-376010"
+project_id = "data-project-2-376316"
 topic_name = "user_position"
 
 ## PUB/SUB class declaration
@@ -67,7 +67,6 @@ def generatedata():
     data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
     data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
     data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
-    data["payment_method"] = random.choice(['Credit card', 'Paypal', 'Cash'])
 
     return data
 
