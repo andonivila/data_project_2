@@ -25,7 +25,7 @@ import logging
 import requests
 
 #Initial variables
-project_id = "arctic-cursor-376010"
+project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
