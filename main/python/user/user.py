@@ -67,7 +67,6 @@ def generatedata():
     data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
     data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
     data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
-    data["payment_method"] = random.choice(['Credit card', 'Paypal', 'Cash'])
 
     return data
 
