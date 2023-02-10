@@ -61,7 +61,7 @@ def generatedata():
     data={}
     data["user_id"] = generate_user_id()
     data["user_name"] = fake.name()
-    data["user_phone_number"] = generate_phone_number()
+    #data["user_phone_number"] = generate_phone_number()
     #data["user_email"] = fake.email()
     data["userinit_lat"] = str(random.uniform(39.4, 39.5))
     data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
