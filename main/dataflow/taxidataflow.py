@@ -210,7 +210,6 @@ def run_pipeline():
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
         data = (
-            p
                 ({'taxi_data' : taxi_data, 'user_data': user_data})
                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
                 |"Group by zone_id" >> beam.CoGroupByKey()
