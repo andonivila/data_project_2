@@ -188,7 +188,7 @@ class GroupMessagesByFixedWindows(beam.PTransform):
         
     
 '''Dataflow Process'''
-def run_pipeline(window_size = 30, num_shards = 5):
+def run_pipeline(window_size = 1, num_shards = 5):
 
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
