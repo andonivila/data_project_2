@@ -53,8 +53,7 @@ class AddTimestampDoFn(beam.DoFn):
     #Process function to deal with data
     def process(self, element):
         #Add Processing time field
-        element['processing_time'] = str(datetime.now())
-        
+        element['processing_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         yield element
 
 #DoFn02: Get the location fields
