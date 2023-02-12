@@ -57,6 +57,16 @@
     },
     {
         "mode": "NULLABLE",
+        "name": "taxibase_fare",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxikm_fare",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
         "name": "taxi_lat",
         "type": "STRING"
     },
