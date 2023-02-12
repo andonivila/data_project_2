@@ -18,7 +18,6 @@ from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
 from apache_beam.io.gcp import bigquery_tools
 
 #Import Common Libraries
-from datetime import datetime
 import argparse
 import json
 import logging
@@ -52,6 +51,8 @@ class AddTimestampDoFn(beam.DoFn):
 
     #Process function to deal with data
     def process(self, element):
+        from datetime import datetime
+
         #Add Processing time field
         element['processing_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         yield element
@@ -143,6 +144,7 @@ class AddFinalDistanceDoFn(beam.DoFn):
 class MatchShortestDistance(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
+                |"Group by timestamp" >> beam.GroupByKey()
                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
