@@ -46,6 +46,11 @@ def ParsePubSubMessage(message):
     #Return function
     return row
 
+def fill_none(element, default_value):
+    if element is None:
+        return default_value
+    return element
+
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
 
@@ -144,8 +149,9 @@ class AddFinalDistanceDoFn(beam.DoFn):
 class MatchShortestDistance(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
+                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+                |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(60))
                 |"Group by timestamp" >> beam.GroupByKey()
-                |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
@@ -205,7 +211,7 @@ def run_pipeline():
         # Here we have taxi and user data in the same  table
         data = (
                 (user_data, taxi_data) | beam.Flatten()
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+                |"Fill None values" >> beam.Map(lambda x: fill_none(x, "Non Applicable"))
                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
 
