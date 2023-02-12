@@ -191,21 +191,20 @@ def run_pipeline():
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add User Processing Time" >> beam.ParDo(AddTimestampDoFn())
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Add Taxi Processing Time" >> beam.ParDo(AddTimestampDoFn())
+                
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
         data = (
-            p
                 (user_data, taxi_data) | beam.Flatten()
+                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
 
