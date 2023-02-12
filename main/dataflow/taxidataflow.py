@@ -31,7 +31,7 @@ input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
 
 #Indicamos clave Google Maps
-clv_gm = 'AIzaSyCcRPh8O_ifnAKOLpoLCh4VaoqhUf3napQ'
+clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 '''Functions'''
 def ParsePubSubMessage(message):
