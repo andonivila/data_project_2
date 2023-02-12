@@ -70,9 +70,9 @@ def generatedata():
     # data["zone_id"] = random.randint(1,3)
 
     data={
-        "zone_id" : random.randint(1,5),
+        "user_id" : generate_user_id(),
         "payload" : {
-            "user_id" : generate_user_id(),
+            "zone_id" : random.randint(1,5),
             "user_name" : fake.name(),
             "user_phone_number" : generate_phone_number(),
             "user_email" : fake.email(),

@@ -68,16 +68,16 @@ def generatedata():
     # data["zone_id"] = random.randint(1,3)
 
     data={
-    "zone_id" : random.randint(1,5),
-    "payload" : {
         "taxi_id" : generate_user_id(),
-        "taxi_phone_number" : generate_phone_number(),
-        "taxi_lat" : str(random.uniform(39.4, 39.5)),
-        "taxi_lng" : str(random.uniform(-0.4, -0.3)),
-        "taxibase_fare" : str(random.uniform(39.4, 39.5)), 
-        "taxikm_fare" : str(random.uniform(-0.4, -0.3)),
+        "payload" : {
+            "taxi_phone_number" : generate_phone_number(),
+            "taxi_lat" : str(random.uniform(39.4, 39.5)),
+            "taxi_lng" : str(random.uniform(-0.4, -0.3)),
+            "taxibase_fare" : str(random.uniform(39.4, 39.5)), 
+            "taxikm_fare" : str(random.uniform(-0.4, -0.3)),
+            "zone_id" : random.randint(1,5),
+            }
         }
-    }
 
     return data
 
