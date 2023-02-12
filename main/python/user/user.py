@@ -58,15 +58,30 @@ def generate_user_id():
 # Generate data function
 def generatedata():
 
-    data={}
-    data["user_id"] = generate_user_id()
-    data["user_name"] = fake.name()
-    data["user_phone_number"] = generate_phone_number()
-    data["user_email"] = fake.email()
-    data["userinit_lat"] = str(random.uniform(39.4, 39.5))
-    data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
-    data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
-    data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
+    # data={}
+    # data["user_id"] = generate_user_id()
+    # data["user_name"] = fake.name()
+    # data["user_phone_number"] = generate_phone_number()
+    # data["user_email"] = fake.email()
+    # data["userinit_lat"] = str(random.uniform(39.4, 39.5))
+    # data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
+    # data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
+    # data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
+    # data["zone_id"] = random.randint(1,3)
+
+    data={
+        "zone_id" : random.randint(1,5),
+        "payload" : {
+            "user_id" : generate_user_id(),
+            "user_name" : fake.name(),
+            "user_phone_number" : generate_phone_number(),
+            "user_email" : fake.email(),
+            "userinit_lat" : str(random.uniform(39.4, 39.5)), 
+            "userinit_lng" : str(random.uniform(-0.4, -0.3)),
+            "userfinal_lat" : str(random.uniform(39.4, 39.5)), 
+            "userfinal_lng": str(random.uniform(-0.4, -0.3))
+        }
+    }
 
     return data
 

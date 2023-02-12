@@ -46,6 +46,11 @@ def ParsePubSubMessage(message):
     #Return function
     return row
 
+# def fill_none(element, default_value):
+#     if element is None:
+#         return default_value
+#     return element
+
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
 
@@ -54,7 +59,7 @@ class AddTimestampDoFn(beam.DoFn):
         from datetime import datetime
 
         #Add Processing time field
-        element['processing_time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+        element['processing_time'] = str(datetime.now())
         yield element
 
 #DoFn02: Get the location fields
@@ -141,30 +146,49 @@ class AddFinalDistanceDoFn(beam.DoFn):
 
 '''PTransform Classes'''
  
-class MatchShortestDistance(beam.PTransform):
-    def expand(self, pcoll):
-        match = (pcoll
-                |"Group by timestamp" >> beam.GroupByKey()
-                |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
-                |"Get locations" >> beam.ParDo(getLocationsDoFn())
-                |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-                |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-                |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-                |"Group by user_id" >> beam.GroupByKey()
-                | "Find shortest distance" >> beam.Map(lambda x: {
-                    'user_id': x[0],
-                    #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-                    'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-                    'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-                    'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
-                })
-            )
+# class MatchShortestDistance(beam.PTransform):
+#     def expand(self, pcoll):
+#         match = (pcoll
+#                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+#                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(60))
+#                 |"Group by timestamp" >> beam.GroupByKey()
+#                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
+#                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
+#                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+#                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
+#                 |"Group by user_id" >> beam.GroupByKey()
+#                 | "Find shortest distance" >> beam.Map(lambda x: {
+#                     'user_id': x[0],
+#                     #Aqui podemos ir sacando los campos que queramos de la PColl inicial
+#                     'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
+#                     'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
+#                     'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
+#                 })
+#             )
 
-        return match
+#         return match
+
+class GroupMessagesByFixedWindows(beam.PTransform):
+    """A composite transform that groups Pub/Sub messages based on publish time
+    and outputs a list of tuples, each containing a message and its publish time.
+    """
+    def __init__(self, window_size, num_shards=5):
+        # Set window size to 30 seconds.
+        self.window_size = int(window_size * 30)
+        self.num_shards = num_shards
+
+    def expand(self, pcoll):
+        return (
+            pcoll
+            # Bind window info to each element using element timestamp (or publish time).
+            | "Window into fixed intervals">> beam.WindowInto(window.FixedWindows(self.window_size))
+            | "Add timestamp to windowed elements" >> beam.ParDo(AddTimestampDoFn())
+                                    
+        )
         
     
 '''Dataflow Process'''
-def run_pipeline():
+def run_pipeline(window_size = 1, num_shards = 5):
 
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
@@ -192,22 +216,24 @@ def run_pipeline():
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
+                |"Window into taxi" >> GroupMessagesByFixedWindows(window_size, num_shards)
                 
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
+
         data = (
-                (user_data, taxi_data) | beam.Flatten()
-                |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
-                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-                )
+            {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
+            #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
+            )
 
         (
             data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
