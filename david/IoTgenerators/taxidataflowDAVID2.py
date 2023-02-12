@@ -100,17 +100,17 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
         # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
         user_init_lat = element['userinit_lat']
         user_init_long = element['userinit_lng']
-        user_final_lat = element['Userfinal_lat']
-        user_final_long = element['Userfinal_lng']
+        user_final_lat = element['userfinal_lat']
+        user_final_long = element['userfinal_lng']
 
-        user_intit_position = user_init_lat, user_init_long
+        user_init_position = user_init_lat, user_init_long
         user_destination = user_final_lat, user_final_long
 
         # Realiza una solicitud a la A.P.I. de Google Maps
         gmaps = googlemaps.Client(key=clv_gm) 
 
         # Accedemos al elemento distance del JSON rebido
-        element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+        element['final_distance'] = gmaps.distance_matrix(user_destination, user_init_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
         yield element
 
@@ -209,10 +209,15 @@ def run_pipeline():
         merged_data = (
                 (user_data, taxi_data) | beam.Flatten()
                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
-                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
 
-        merged_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+        results = (merged_data
+                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+                |"Associate each user with the closest taxi" >> beam.GroupByKey()
+        )
+
+
+        results | "Write to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{args.output_bigquery}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,

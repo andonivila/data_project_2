@@ -83,13 +83,13 @@ class CalculateInitDistancesDoFn(beam.DoFn):
         user_init_long = element['userinit_lng']
 
         taxi_position = taxi_lat, taxi_long
-        user_intit_position = user_init_lat, user_init_long
+        user_init_position = user_init_lat, user_init_long
 
         # Realiza una solicitud a la A.P.I. de Google Maps
         gmaps = googlemaps.Client(key=clv_gm) 
 
         # Accedemos al elemento distance del JSON recibido
-        element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+        element['init_distance'] = gmaps.distance_matrix(taxi_position, user_init_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
         yield element
 
@@ -100,8 +100,8 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
         # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
         user_init_lat = element['userinit_lat']
         user_init_long = element['userinit_lng']
-        user_final_lat = element['Userfinal_lat']
-        user_final_long = element['Userfinal_lng']
+        user_final_lat = element['userfinal_lat']
+        user_final_long = element['userfinal_lng']
 
         user_intit_position = user_init_lat, user_init_long
         user_destination = user_final_lat, user_final_long
@@ -210,7 +210,7 @@ def run_pipeline():
         data = (
                 (user_data, taxi_data) | beam.Flatten()
                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
-                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+                #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
 
         (
