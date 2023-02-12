@@ -144,6 +144,7 @@ class AddFinalDistanceDoFn(beam.DoFn):
 class MatchShortestDistance(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
+                |"Group by timestamp" >> beam.GroupByKey()
                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
