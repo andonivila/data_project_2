@@ -216,14 +216,14 @@ def run_pipeline(window_size = 30, num_shards = 5):
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Window into" >> GroupMessagesByFixedWindows(window_size, num_shards)
+                |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Window into" >> GroupMessagesByFixedWindows(window_size, num_shards)
+                |"Window into taxi" >> GroupMessagesByFixedWindows(window_size, num_shards)
                 
         )
 
