@@ -46,10 +46,10 @@ def ParsePubSubMessage(message):
     #Return function
     return row
 
-def fill_none(element, default_value):
-    if element is None:
-        return default_value
-    return element
+# def fill_none(element, default_value):
+#     if element is None:
+#         return default_value
+#     return element
 
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
@@ -210,9 +210,12 @@ def run_pipeline():
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
         data = (
-                (user_data, taxi_data) | beam.Flatten()
-                |"Fill None values" >> beam.Map(lambda x: fill_none(x, "Non Applicable"))
-                |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+            p
+                ({'taxi_data' : taxi_data, 'user_data': user_data})
+                |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
+                |"Group by zone_id" >> beam.CoGroupByKey()
+                #|"Fill None values" >> beam.Map(lambda x: fill_none(x, "Non Applicable"))
+                #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
 
         (
