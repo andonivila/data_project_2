@@ -65,6 +65,7 @@ def generatedata():
     data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
     data["taxibase_fare"] = str(4.00)
     data["taxikm_fare"] = str(1.09)
+    data["zone_id"] = random.randint(1,3)
 
     return data
 
