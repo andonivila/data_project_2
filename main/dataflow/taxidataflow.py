@@ -145,7 +145,9 @@ class MatchShortestDistance(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
-                |"Get locations" >> beam.ParDo()
+                |"Get locations" >> beam.ParDo(getLocationsDoFn())
+                |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
+                |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
                 |"Group by user_id" >> beam.GroupByKey()
                 | "Find shortest distance" >> beam.Map(lambda x: {
@@ -206,6 +208,15 @@ def run_pipeline():
                 (user_data, taxi_data) | beam.Flatten()
                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
                 )
+
+        (
+            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+                table = f"{project_id}:{args.output_bigquery}",
+                schema = schema,
+                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+            )
+        )
 
         ###Step05: Get the closest driver for the user per Window
         # (
