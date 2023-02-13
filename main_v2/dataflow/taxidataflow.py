@@ -28,6 +28,10 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
+output_big_query_user = "dataproject2376316.user_table"
+output_big_query_taxi = "dataproject2376316.taxi_table"
+bigquery_schema_path_user = "schema/bq_user.json"
+bigquery_schema_path_taxi = "schema/bq_taxi.json"
 
 #Indicamos clave Google Maps
 clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
@@ -198,18 +202,20 @@ def run_pipeline(window_size = 1, num_shards = 5):
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
 
-    parser.add_argument('--output_bigquery_user', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
-    parser.add_argument('--output_bigquery_taxi', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
-    parser.add_argument('--bigquery_schema_path_user', required=True, help='BigQuery Schema Path within the repository.')
-    parser.add_argument('--bigquery_schema_path_taxi', required=True, help='BigQuery Schema Path within the repository.')
-
     args, pipeline_opts = parser.parse_known_args()
 
     #Load schema from /schema folder 
-    with open(args.bigquery_schema_path) as file:
-            input_schema = json.load(file)
+    with open(bigquery_schema_path_user) as file1:
+            input_schema = json.load(file1)
 
-    schema = bigquery_tools.parse_table_schema_from_json(json.dumps(input_schema))
+    user_schema = bigquery_tools.parse_table_schema_from_json(json.dumps(input_schema))
+
+    with open(bigquery_schema_path_taxi) as file2:
+            input_schema = json.load(file2)
+
+    taxi_schema = bigquery_tools.parse_table_schema_from_json(json.dumps(input_schema))
+
+
 
     ### Apache Beam Pipeline
     #Pipeline options
@@ -247,8 +253,8 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
         (
             user_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery_user}",
-                schema = schema,
+                table = f"{project_id}:{output_big_query_user}",
+                schema = user_schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
@@ -256,8 +262,8 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
         (
             taxi_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery_taxi}",
-                schema = schema,
+                table = f"{project_id}:{output_big_query_taxi}",
+                schema = taxi_schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
