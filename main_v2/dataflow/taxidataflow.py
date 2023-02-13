@@ -191,7 +191,7 @@ class GroupMessagesByFixedWindows(beam.PTransform):
             pcoll
             # Bind window info to each element using element timestamp (or publish time).
             | "Window into fixed intervals">> beam.WindowInto(window.FixedWindows(self.window_size))
-            | "Add timestamp to windowed elements" >> beam.ParDo(AddTimestampDoFn())
+            #| "Add timestamp to windowed elements" >> beam.ParDo(AddTimestampDoFn())
                                     
         )
         
@@ -202,7 +202,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
 
-    args, pipeline_opts = parser.parse_known_args()
+    pipeline_opts = parser.parse_known_args()
 
     #Load schema from /schema folder 
     with open(bigquery_schema_path_user) as file1:
@@ -252,7 +252,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
         # )
 
         (
-            user_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+            user_data | "Write user to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{output_big_query_user}",
                 schema = user_schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
@@ -261,7 +261,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
         )
 
         (
-            taxi_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+            taxi_data | "Write taxi to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{output_big_query_taxi}",
                 schema = taxi_schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
