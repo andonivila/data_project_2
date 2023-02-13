@@ -165,6 +165,7 @@ class MatchShortestDistance(beam.PTransform):
             )
 
         return match
+
             
 '''Dataflow Process'''
 def run_pipeline():
@@ -213,7 +214,6 @@ def run_pipeline():
 
         results = (merged_data
                 |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-                |"Associate each user with the closest taxi" >> beam.GroupByKey()
         )
 
 
