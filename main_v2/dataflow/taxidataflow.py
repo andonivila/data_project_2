@@ -247,7 +247,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
         (
             user_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery_1}",
+                table = f"{project_id}:{args.output_bigquery_user}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
@@ -256,7 +256,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
         (
             taxi_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery_2}",
+                table = f"{project_id}:{args.output_bigquery_taxi}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
