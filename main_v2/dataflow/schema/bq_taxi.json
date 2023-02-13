@@ -2,33 +2,38 @@
     "fields": [
     {
         "mode": "NULLABLE",
-        "name": "user_id",
+        "name": "zone_id",
         "type": "STRING"
     },
-
     {
         "mode": "NULLABLE",
         "name": "taxi_id",
         "type": "STRING"
     },
-
     {
         "mode": "NULLABLE",
-        "name": "init_distance",
+        "name": "taxi_phone_number",
         "type": "STRING"
     },
-
     {
         "mode": "NULLABLE",
-        "name": "final_distance",
+        "name": "taxibase_fare",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxikm_fare",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_lat",
         "type": "STRING"
     },
-
     {
         "mode": "NULLABLE",
-        "name": "total_distance",
+        "name": "taxi_lng",
         "type": "STRING"
     }
-
     ]
 }

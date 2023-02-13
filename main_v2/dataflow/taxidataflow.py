@@ -198,8 +198,10 @@ def run_pipeline(window_size = 1, num_shards = 5):
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
 
-    parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
-    parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.')
+    parser.add_argument('--output_bigquery_user', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
+    parser.add_argument('--output_bigquery_taxi', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
+    parser.add_argument('--bigquery_schema_path_user', required=True, help='BigQuery Schema Path within the repository.')
+    parser.add_argument('--bigquery_schema_path_taxi', required=True, help='BigQuery Schema Path within the repository.')
 
     args, pipeline_opts = parser.parse_known_args()
 
@@ -235,17 +237,26 @@ def run_pipeline(window_size = 1, num_shards = 5):
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
 
-        data = (
-            {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
-            |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
-            |
-            #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
-            #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
+        # data = (
+        #     {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
+        #     |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
+        #     |
+        #     #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
+        #     #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
+        # )
+
+        (
+            user_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+                table = f"{project_id}:{args.output_bigquery_1}",
+                schema = schema,
+                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+            )
         )
 
         (
-            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{args.output_bigquery}",
+            taxi_data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+                table = f"{project_id}:{args.output_bigquery_2}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND

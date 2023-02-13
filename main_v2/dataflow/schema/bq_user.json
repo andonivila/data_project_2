@@ -44,36 +44,6 @@
         "mode": "NULLABLE",
         "name": "userfinal_lng",
         "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_id",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_phone_number",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxibase_fare",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxikm_fare",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_lat",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_lng",
-        "type": "STRING"
     }
     ]
 }
