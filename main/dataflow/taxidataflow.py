@@ -62,6 +62,11 @@ class AddTimestampDoFn(beam.DoFn):
         element['processing_time'] = str(datetime.now())
         yield element
 
+##DoFn02: Extract payload
+class extractPayloadDoFn(beam.DoFn):
+    def process(self, element):
+        yield element[1]
+
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
@@ -232,8 +237,10 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
         data = (
             {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
+            | "Extract Payload" >> beam.ParDo(extractPayloadDoFn())
+            #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
             #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
-            )
+        )
 
         (
             data | "Write to BigQuery" >> beam.io.WriteToBigQuery(

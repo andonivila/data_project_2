@@ -32,7 +32,7 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new user is looking for a taxi. Id: %s", message['user_id'])
+        logging.info("A new user is looking for a taxi. Zone_id: %s", message['zone_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
