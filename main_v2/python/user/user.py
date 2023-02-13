@@ -6,6 +6,7 @@ from faker import Faker
 from google.cloud import pubsub_v1
 import logging
 import string
+from datetime import datetime
 
 ###########################
 ### USER DATA GENERATOR ###
@@ -68,6 +69,7 @@ def generatedata():
     data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
     data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
     data["zone_id"] = random.randint(1,3)
+    data["timestamp"] = datetime.now()
 
     # data={
     #     "zone_id" : random.randint(1,5),

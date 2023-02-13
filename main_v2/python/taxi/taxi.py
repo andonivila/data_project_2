@@ -6,6 +6,7 @@ from faker import Faker
 from google.cloud import pubsub_v1
 import logging
 import string
+from datetime import datetime
 
 ###########################
 ### TAXI DATA GENERATOR ###
@@ -66,6 +67,7 @@ def generatedata():
     data["taxibase_fare"] = str(4.00)
     data["taxikm_fare"] = str(1.09)
     data["zone_id"] = random.randint(1,3)
+    data["timestamp"] = datetime.now()
 
     # data={
     #     "zone_id" : random.randint(1,5),
