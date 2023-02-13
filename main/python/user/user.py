@@ -97,7 +97,7 @@ def senddata(project_id, topic_name):
             pubsub_class.publishMessages(message)
 
             #it will be generated a transaction each 10 seconds
-            time.sleep(10)
+            time.sleep(random.randint(5, 30))
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:
