@@ -238,7 +238,6 @@ def run_pipeline(window_size = 1, num_shards = 5):
         data = (
             {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
             |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
-            |
             #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
             #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
         )

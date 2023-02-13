@@ -2,6 +2,9 @@
     Master Data Analytics EDEM
     Academic Year 2022-2023"""
 
+""" Solución de contingencia por 
+    si no nos funciona el otro main """
+
 """ Import libraries """
 
 #Import beam libraries
@@ -199,6 +202,9 @@ class GroupMessagesByFixedWindows(beam.PTransform):
 '''Dataflow Process'''
 def run_pipeline(window_size = 1, num_shards = 5):
 
+    parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
+
+    args, pipeline_opts = parser.parse_known_args()
 
     #Load schema from /schema folder 
     with open(bigquery_schema_path_user) as file1:
@@ -215,10 +221,10 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
     ### Apache Beam Pipeline
     #Pipeline options
-    options = PipelineOptions(save_main_session = True, streaming = True, project = project_id)
+    options = PipelineOptions(pipeline_opts, save_main_session = True, streaming = True, project = project_id)
 
     #Pipeline
-    with beam.Pipeline(options=options) as p:
+    with beam.Pipeline(argv=pipeline_opts, options=options) as p:
 
         ###Step01: Read user and taxi data from PUB/SUB
         user_data = (
@@ -226,14 +232,26 @@ def run_pipeline(window_size = 1, num_shards = 5):
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
                 |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
-        )
+                | "Write user to BigQuery" >> beam.io.WriteToBigQuery(
+                    table = f"{project_id}:{output_big_query_user}",
+                    schema = user_schema,
+                    create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                    write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+                )
+            )
+
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
                 |"Window into taxi" >> GroupMessagesByFixedWindows(window_size, num_shards)
-                
+                | "Write taxi to BigQuery" >> beam.io.WriteToBigQuery(
+                    table = f"{project_id}:{output_big_query_taxi}",
+                    schema = taxi_schema,
+                    create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
+                    write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
+                )
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
@@ -247,23 +265,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
         #     #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
         # )
 
-        (
-            user_data | "Write user to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{output_big_query_user}",
-                schema = user_schema,
-                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-            )
-        )
-
-        (
-            taxi_data | "Write taxi to BigQuery" >> beam.io.WriteToBigQuery(
-                table = f"{project_id}:{output_big_query_taxi}",
-                schema = taxi_schema,
-                create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-                write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-            )
-        )
+        
 
         ###Step05: Get the closest driver for the user per Window
         # (
@@ -290,3 +292,4 @@ if __name__ == '__main__' :
     logging.getLogger().setLevel(logging.INFO)
     #Run process
     run_pipeline()
+
