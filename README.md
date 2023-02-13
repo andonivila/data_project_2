@@ -1,8 +1,8 @@
 # ÍNDICE
 ## 1. Generador de datos taxi
 ## 2. Generador de datos user
-## 3. Dataflow
-##
+## 3. Estructura Dataflow
+## 4. Visualización
 
 # 1.GENERADOR DE DATOS TAXI
 
@@ -311,7 +311,7 @@ if __name__ == "__main__":
 #Mediante está funcion se ejecuta la función sendata creada justo antes, la cual coge las dos variables declaradas al principio del script, "project_id" y "topic_name"
 ```
 
-# ESTRUCTURA TAXI DATAFLOW
+# ESTRUCTURA DATAFLOW
 ## Importar librerias BEAM
 En primer lugar se importarán las librearías neceasrias para poder ejecutar en el entorno BEAM
 
