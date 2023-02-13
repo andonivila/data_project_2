@@ -46,10 +46,10 @@ def ParsePubSubMessage(message):
     #Return function
     return row
 
-def fill_none(element, default_value):
-     if element is None:
-        return default_value
-     return element
+# def fill_none(element, default_value):
+#     if element is None:
+#         return default_value
+#     return element
 
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
@@ -146,26 +146,26 @@ class AddFinalDistanceDoFn(beam.DoFn):
 
 '''PTransform Classes'''
  
-class MatchShortestDistance(beam.PTransform):
-     def expand(self, pcoll):
-         match = (pcoll
-                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
-                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(60))
-                 |"Group by timestamp" >> beam.GroupByKey()
-                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
-                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-                 |"Group by user_id" >> beam.GroupByKey()
-                 |"Find shortest distance" >> beam.Map(lambda x: {
-                     'user_id': x[0],
-                     #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-                     'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-                     'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-                     'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
-                })
-             )
-         return match
+# class MatchShortestDistance(beam.PTransform):
+#     def expand(self, pcoll):
+#         match = (pcoll
+#                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
+#                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(60))
+#                 |"Group by timestamp" >> beam.GroupByKey()
+#                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
+#                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
+#                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
+#                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
+#                 |"Group by user_id" >> beam.GroupByKey()
+#                 | "Find shortest distance" >> beam.Map(lambda x: {
+#                     'user_id': x[0],
+#                     #Aqui podemos ir sacando los campos que queramos de la PColl inicial
+#                     'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
+#                     'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
+#                     'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
+#                 })
+#             )
+#         return match
 
 class GroupMessagesByFixedWindows(beam.PTransform):
     """A composite transform that groups Pub/Sub messages based on publish time
@@ -214,7 +214,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Window into user" >> GroupMessagesByFixedWindows(window_size, num_shards)
+                |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
         )
 
         taxi_data = (
@@ -229,19 +229,21 @@ def run_pipeline(window_size = 1, num_shards = 5):
         # Here we have taxi and user data in the same  table
 
         data = (
-            (taxi_data,user_data) | beam.CoGroupByKey()
-            |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
-            |"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
-            |"Get shortest distance between user and taxis" >> MatchShortestDistance()
+            {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
+            | "Extract Payload" >> beam.ParDo(extractPayloadDoFn())
+            #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
+            #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
         )
 
-        data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
+        (
+            data | "Write to BigQuery" >> beam.io.WriteToBigQuery(
                 table = f"{project_id}:{args.output_bigquery}",
                 schema = schema,
                 create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
-        
+        )
+
 if __name__ == '__main__' : 
     #Add Logs
     logging.getLogger().setLevel(logging.INFO)
