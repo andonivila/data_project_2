@@ -34,6 +34,11 @@
         "mode": "NULLABLE",
         "name": "taxi_lng",
         "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "timestamp",
+        "type": "STRING"
     }
     ]
 }

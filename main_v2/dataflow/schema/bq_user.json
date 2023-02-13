@@ -44,6 +44,11 @@
         "mode": "NULLABLE",
         "name": "userfinal_lng",
         "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "timestamp",
+        "type": "STRING"
     }
     ]
 }
