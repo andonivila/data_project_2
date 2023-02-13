@@ -67,7 +67,7 @@ def generatedata():
     data["taxibase_fare"] = str(4.00)
     data["taxikm_fare"] = str(1.09)
     data["zone_id"] = random.randint(1,3)
-    data["timestamp"] = datetime.now()
+    data["timestamp"] = str(datetime.now())
 
     # data={
     #     "zone_id" : random.randint(1,5),

@@ -69,7 +69,7 @@ def generatedata():
     data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
     data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
     data["zone_id"] = random.randint(1,3)
-    data["timestamp"] = datetime.now()
+    data["timestamp"] = str(datetime.now())
 
     # data={
     #     "zone_id" : random.randint(1,5),

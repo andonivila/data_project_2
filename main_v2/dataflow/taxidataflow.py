@@ -199,10 +199,6 @@ class GroupMessagesByFixedWindows(beam.PTransform):
 '''Dataflow Process'''
 def run_pipeline(window_size = 1, num_shards = 5):
 
-    # Input arguments
-    parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
-
-    pipeline_opts = parser.parse_known_args()
 
     #Load schema from /schema folder 
     with open(bigquery_schema_path_user) as file1:
@@ -219,10 +215,10 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
     ### Apache Beam Pipeline
     #Pipeline options
-    options = PipelineOptions(pipeline_opts, save_main_session = True, streaming = True, project = project_id)
+    options = PipelineOptions(save_main_session = True, streaming = True, project = project_id)
 
     #Pipeline
-    with beam.Pipeline(argv=pipeline_opts, options=options) as p:
+    with beam.Pipeline(options=options) as p:
 
         ###Step01: Read user and taxi data from PUB/SUB
         user_data = (
