@@ -27,10 +27,10 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
-#clv_gm = "AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U"
+clv_gm = "AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U"
 
 #Indicamos clave Google Maps
-clv_gm = os.environ ['clv_gm']
+#clv_gm = os.environ ['clv_gm']
 
 '''Functions'''
 def ParsePubSubMessage(message):
