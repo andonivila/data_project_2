@@ -65,18 +65,3 @@ En cambio si se escoge "Cloud", se está escogiendo un servidor con una tasa de 
 También existen otros beneficios como se pueden apreciar en la imagen siguiente que no se comentan pero que apoyan la decisión de realizarla "On Cloud"
 
 ![logo](https://d3t4nwcgmfrp9x.cloudfront.net/upload/VENTAJAS-CLOUD.jpg)
-
-## Parte 02: Explicación del modelo
-
-Estructura
-1. Generación del dato
-
-1.1 Archivo Python
-1.1.1. Taxi
-1.1.2. Usuario
-
-1.2. Dockerfile
-1.2.1. Taxi
-1.2.2. Usuario
-
-2. Dataflow

@@ -12,8 +12,6 @@ from apache_beam.transforms.combiners import CountCombineFn
 from apache_beam.transforms.core import CombineGlobally
 import apache_beam.transforms.window as window
 from apache_beam.transforms import util
-import googlemaps
-
 from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
 from apache_beam.io.gcp import bigquery_tools
 
@@ -21,6 +19,7 @@ from apache_beam.io.gcp import bigquery_tools
 import argparse
 import json
 import logging
+import os
 import requests
 
 #Initial variables
@@ -28,9 +27,10 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
+clv_gm = "AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U"
 
 #Indicamos clave Google Maps
-clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+#clv_gm = os.environ ['clv_gm']
 
 '''Functions'''
 def ParsePubSubMessage(message):
@@ -46,8 +46,8 @@ def ParsePubSubMessage(message):
     #Return function
     return ('DP2',row)
 
-def ClaculateDistances(element):
-
+#Function to calculate total distance and the total amount of the journey
+def CalculateDistances(element):
     from googlemaps import Client
 
     key, data = element
@@ -55,29 +55,57 @@ def ClaculateDistances(element):
 
     gmaps = Client(key=clv_gm)
 
-    #Calculating distance between users and taxis
+    ################################################
+    ###Calculate distance between users and taxis###
+    ################################################
+
+    # Extracting Variables
     user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
     taxi_position = (data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"])
     user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
 
+    # Calculating distances with distance matrix
     distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
     distance_matrix_2 = gmaps.distance_matrix(user_init_position, user_final_position, mode='driving')
 
-
+    # Accessing distance values
     init_distance = distance_matrix_1['rows'][0]['elements'][0]['distance']['value']
     final_distance = distance_matrix_2['rows'][0]['elements'][0]['distance']['value']
+    total_distance = init_distance + final_distance
 
+    ######################################
+    ### Calculate total journey amount ###
+    ######################################
+
+    # Extracting variables
+    taxikm_fare = data["taxis"][0]["taxikm_fare"]
+    taxibase_fare = data["taxis"][0]["taxibase_fare"]
+
+    # Calculating total fare
+    partial_fare = taxikm_fare * (total_distance/1000 - 2.5)
+
+    if partial_fare > 0:
+        total_fare = taxibase_fare + partial_fare
+
+    else:
+        total_fare = taxibase_fare
+
+    # Format of the output message
     bq_element = {
         'user_id': data["users"][0]["user_id"],
         'taxi_id': data["taxis"][0]["taxi_id"],
-        'userinit_lat' : data["users"][0]["userinit_lat"],
-        'userinit_lng' : data["users"][0]["userinit_lng"],
-        'taxi_lat' : data["taxis"][0]["taxi_lat"],
-        'taxi_lng' : data["taxis"][0]["taxi_lng"],
-        'init_distance': init_distance,
-        'userfinal_lat' : data["users"][0]["userfinal_lat"],
-        'userfinal_lng' :  data["users"][0]["userfinal_lng"],
-        'final_distance' : final_distance
+        'userinit_lat' : float(data["users"][0]["userinit_lat"]),
+        'userinit_lng' : float(data["users"][0]["userinit_lng"]),
+        'taxi_lat' : float(data["taxis"][0]["taxi_lat"]),
+        'taxi_lng' : float(data["taxis"][0]["taxi_lng"]),
+        'init_distance': float(init_distance),
+        'userfinal_lat' : float(data["users"][0]["userfinal_lat"]),
+        'userfinal_lng' :  float(data["users"][0]["userfinal_lng"]),
+        'final_distance' : final_distance,
+        'total_distance' : total_distance,
+        'taxibase_fare' : data["taxis"][0]["taxibase_fare"],
+        'taxikm_fare' : data["taxis"][0]["taxikm_fare"],
+        "transaction_amount" : total_fare
     }
 
     return bq_element
@@ -94,30 +122,16 @@ class AddTimestampDoFn(beam.DoFn):
         element['processing_time'] = str(datetime.now())
         yield element
 
-
-#DoFn06: Calculating final distance
-class AddFinalDistanceDoFn(beam.DoFn):
-    def process(self, element):
-        element['total_distance'] = element['init_distance'] + element['final_distance']
-
-        yield element
-
-# class CalculateTransactionAmount(beam.DoFn):
-#     def process(self, element):
-
-
 '''PTransform Classes'''
 
 class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
-        match = (pcoll
-            |"Calculate distances" >> beam.Map(ClaculateDistances)
+        calculate = (pcoll
+            |"Calculate distances" >> beam.Map(CalculateDistances)
         )
 
-        return match
+        return calculate
 
-        
-    
 '''Dataflow Process'''
 def run_pipeline():
 
@@ -182,40 +196,3 @@ if __name__ == '__main__' :
     logging.getLogger().setLevel(logging.INFO)
     #Run process
     run_pipeline()
-
-
-        ###Step05: Get the closest driver for the user per Window
-        # (
-        #     data
-        #          |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-        #          |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-        #          |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-        #          |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
-        #          |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-        #          |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-        #          |"Calculate total distance" >> beam.ParDo(AddFinalDistanceDoFn())
-        #          |"Write to BigQuery" >> beam.io.WriteToBigQuery(
-        #             table = f"{project_id}:{args.output_bigquery}",
-        #             schema = schema,
-        #             create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-        #             write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-        #         )
-                 #|"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
-        # )
-
-
-    #     class MatchShortestDistance(beam.PTransform):
-    # def expand(self, pcoll):
-    #     match = (pcoll
-    #             |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-    #             |"Group by user_id" >> beam.GroupByKey()
-    #             |"Find shortest distance" >> beam.Map(lambda x: {
-    #                 'user_id': x[0],
-    #                 #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-    #                 'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-    #                 'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-    #                 'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
-    #             })
-    #         )
-
-    #     return match

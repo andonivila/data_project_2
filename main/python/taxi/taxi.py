@@ -63,8 +63,8 @@ def generatedata():
     data["taxi_phone_number"] = generate_phone_number()
     data["taxi_lat"] = str(random.uniform(39.4, 39.5))
     data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
-    data["taxibase_fare"] = str(4.00)
-    data["taxikm_fare"] = str(1.09)
+    data["taxibase_fare"] = 4.00
+    data["taxikm_fare"] = 1.09
 
     return data
 
@@ -80,7 +80,7 @@ def senddata(project_id, topic_name):
             pubsub_class.publishMessages(message)
 
             #it will be generated a transaction each 10 seconds
-            time.sleep(random.randint(5, 30))
+            time.sleep(random.randint(5, 15))
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:
