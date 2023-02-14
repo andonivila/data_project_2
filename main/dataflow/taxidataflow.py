@@ -51,16 +51,16 @@ def BusinessLogic(element):
     key, data = element
     logging.info(f"This is my raw data: {data}")
 
-    # Calculating distance between users and taxis
-    # for user_lat, user_lng in data['users'][0]["user_init_lat"], data['users'][0]["user_init_lng"]:
-    #     for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
+    #Calculating distance between users and taxis
+    for user_lat, user_lng in data['users'][0]["userinit_lat"], data['users'][0]["userinit_lng"]:
+        for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
 
-            # user_PU_position = user_lat, user_lng
-            # taxi_position = taxi_lat, taxi_lng
+            user_PU_position = user_lat, user_lng
+            taxi_position = taxi_lat, taxi_lng
 
-            # gmaps = googlemaps.Client(key=clv_gm) 
+            gmaps = googlemaps.Client(key=clv_gm) 
 
-            # init_distance = gmaps.distance_matrix(user_PU_position, taxi_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+            init_distance = gmaps.distance_matrix(user_PU_position, taxi_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
     bq_element = {
         'user_id': data["users"][0]["user_id"],
@@ -69,6 +69,7 @@ def BusinessLogic(element):
         'userinit_lng' : data["users"][0]["userinit_lng"],
         'taxi_lat' : data["taxis"][0]["taxi_lat"],
         'taxi_lng' : data["taxis"][0]["taxi_lng"],
+        'init_distance': init_distance
 
         #'init distance' : init_distance
     }

@@ -29,6 +29,11 @@
         "mode": "NULLABLE",
         "name": "taxi_lng",
         "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "init_distance",
+        "type": "STRING"
     }
     ]
 }
