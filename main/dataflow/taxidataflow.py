@@ -31,7 +31,7 @@ output_topic = "surge_pricing"
 
 # Enter the Google Maps API_KEY
 load_dotenv()
-clv_gm = str(os.getenv['CLAVE_API_GOOGLE_MAPS'])
+clv_gm = os.getenv('CLAVE_API_GOOGLE_MAPS')
 
 '''Functions'''
 def ParsePubSubMessage(message):
