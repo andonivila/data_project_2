@@ -113,7 +113,6 @@ class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
             |"Calculate distances" >> beam.ParDo(CalculateDIstancesDoFn())
-    
         )
 
         return match
