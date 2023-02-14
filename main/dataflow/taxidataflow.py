@@ -83,10 +83,6 @@ class CalculateDIstancesDoFn(beam.DoFn):
 
         return bq_element
 
-# def fill_none(element, default_value):
-#     if element is None:
-#         return default_value
-#     return element
 
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
@@ -98,76 +94,6 @@ class AddTimestampDoFn(beam.DoFn):
         #Add Processing time field
         element['processing_time'] = str(datetime.now())
         yield element
-
-#DoFn02: Get the location fields
-class getLocationsDoFn(beam.DoFn):
-    def process(self, element):
-        
-        yield (
-            element['taxi_id'],
-            element['taxi_lat'], 
-            element['taxi_lng'], 
-            element['taxibase_fare'], 
-            element['taxikm_fare'],
-            element['user_id'], 
-            element['userinit_lat'], 
-            element['userinit_lng'], 
-            element['userfinal_lat'], 
-            element['userfinal_lng'], 
-            )
-
-
-#DoFn03: Calculate distance between user init location and taxi
-class CalculateInitDistancesDoFn(beam.DoFn):
-    def process(self, element):
-
-        taxi_lat = element['taxi_lat']
-        taxi_long = element['taxi_lng']
-        user_init_lat = element['userinit_lat']
-        user_init_long = element['userinit_lng']
-
-        taxi_position = taxi_lat, taxi_long
-        user_intit_position = user_init_lat, user_init_long
-
-        # Realiza una solicitud a la A.P.I. de Google Maps
-        gmaps = googlemaps.Client(key=clv_gm) 
-
-        # Accedemos al elemento distance del JSON recibido
-        element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
-
-        yield element
-
-#DoFn04: Calculate final distance between user init location and user final location
-class CalculateFinalDistancesDoFn(beam.DoFn):
-    def process(self, element):
-
-        # credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
-        user_init_lat = element['userinit_lat']
-        user_init_long = element['userinit_lng']
-        user_final_lat = element['Userfinal_lat']
-        user_final_long = element['Userfinal_lng']
-
-        
-        user_intit_position = user_init_lat, user_init_long
-        user_destination = user_final_lat, user_final_long
-
-        # Realiza una solicitud a la API de Google Maps
-        gmaps = googlemaps.Client(key=clv_gm) 
-
-        # Accedemos al elemento distance del JSON rebido
-        element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
-
-        yield element
-
-#DoFn05: Removing locations from data once init and final distances are calculated
-class RemoveLocations(beam.DoFn):
-    def process(self, element):
-        yield (
-            element['user_id'], 
-            element['taxi_id'], 
-            element['init_distance'], 
-            element['final_distance']
-        )
 
 
 #DoFn06: Calculating final distance
@@ -256,6 +182,13 @@ def run_pipeline():
             )
         )
 
+if __name__ == '__main__' : 
+    #Add Logs
+    logging.getLogger().setLevel(logging.INFO)
+    #Run process
+    run_pipeline()
+
+
         ###Step05: Get the closest driver for the user per Window
         # (
         #     data
@@ -274,10 +207,3 @@ def run_pipeline():
         #         )
                  #|"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
         # )
-        
-
-if __name__ == '__main__' : 
-    #Add Logs
-    logging.getLogger().setLevel(logging.INFO)
-    #Run process
-    run_pipeline()
