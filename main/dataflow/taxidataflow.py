@@ -56,7 +56,7 @@ def CalculateDistances(element):
 
     #Calculating distance between users and taxis
     user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
-    taxi_position = data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"]
+    taxi_position = (data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"])
     user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
 
     distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
