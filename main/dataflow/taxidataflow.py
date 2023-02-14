@@ -127,7 +127,6 @@ def run_pipeline():
 
     parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.')
     parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.')
-    parser.add_argument('--requirements_file', required=True, help='Path to rquirements.txt')
 
     args, pipeline_opts = parser.parse_known_args()
 
