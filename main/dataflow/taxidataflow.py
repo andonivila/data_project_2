@@ -12,8 +12,6 @@ from apache_beam.transforms.combiners import CountCombineFn
 from apache_beam.transforms.core import CombineGlobally
 import apache_beam.transforms.window as window
 from apache_beam.transforms import util
-import googlemaps
-
 from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
 from apache_beam.io.gcp import bigquery_tools
 
@@ -48,8 +46,8 @@ def ParsePubSubMessage(message):
     #Return function
     return ('DP2',row)
 
-def ClaculateDistances(element):
-
+#Function to calculate total distance and the total amount of the journey
+def CalculateDistances(element):
     from googlemaps import Client
 
     key, data = element
@@ -124,30 +122,16 @@ class AddTimestampDoFn(beam.DoFn):
         element['processing_time'] = str(datetime.now())
         yield element
 
-
-# #DoFn06: Calculating final distance
-# class AddFinalDistanceDoFn(beam.DoFn):
-#     def process(self, element):
-#         element['total_distance'] = element['init_distance'] + element['final_distance']
-
-#         yield element
-
-# class CalculateTransactionAmount(beam.DoFn):
-#     def process(self, element):
-
-
 '''PTransform Classes'''
 
 class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
-        match = (pcoll
-            |"Calculate distances" >> beam.Map(ClaculateDistances)
+        calculate = (pcoll
+            |"Calculate distances" >> beam.Map(CalculateDistances)
         )
 
-        return match
+        return calculate
 
-        
-    
 '''Dataflow Process'''
 def run_pipeline():
 
@@ -212,40 +196,3 @@ if __name__ == '__main__' :
     logging.getLogger().setLevel(logging.INFO)
     #Run process
     run_pipeline()
-
-
-        ###Step05: Get the closest driver for the user per Window
-        # (
-        #     data
-        #          |"Get location fields." >> beam.ParDo(getLocationsDoFn())
-        #          |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-        #          |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-        #          |"Removing locations from data once init and final distances are calculated" >> beam.ParDo(RemoveLocations()) 
-        #          |"Set fixed window" >> beam.WindowInto(window.FixedWindows(60))
-        #          |"Get shortest distance between user and taxis" >> MatchShortestDistance()
-        #          |"Calculate total distance" >> beam.ParDo(AddFinalDistanceDoFn())
-        #          |"Write to BigQuery" >> beam.io.WriteToBigQuery(
-        #             table = f"{project_id}:{args.output_bigquery}",
-        #             schema = schema,
-        #             create_disposition = beam.io.BigQueryDisposition.CREATE_IF_NEEDED,
-        #             write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
-        #         )
-                 #|"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
-        # )
-
-
-    #     class MatchShortestDistance(beam.PTransform):
-    # def expand(self, pcoll):
-    #     match = (pcoll
-    #             |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-    #             |"Group by user_id" >> beam.GroupByKey()
-    #             |"Find shortest distance" >> beam.Map(lambda x: {
-    #                 'user_id': x[0],
-    #                 #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-    #                 'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-    #                 'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-    #                 'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
-    #             })
-    #         )
-
-    #     return match
