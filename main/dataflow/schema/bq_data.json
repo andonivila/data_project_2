@@ -58,17 +58,17 @@
     {
         "mode": "NULLABLE",
         "name": "taxibase_fare",
-        "type": "STRING"
+        "type": "NUMERIC"
     }, 
     {
         "mode": "NULLABLE",
         "name": "taxikm_fare",
-        "type": "STRING"
+        "type": "NUMERIC"
     }, 
     {
         "mode": "NULLABLE",
         "name": "transaction_amount",
-        "type": "STRING"
+        "type": "NUMERIC"
     }
     ]
 }
