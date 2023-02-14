@@ -46,21 +46,25 @@ def ParsePubSubMessage(message):
     #Return function
     return ('DP2',row)
 
-def BusinessLogic(element):
+
+def CalculateDistances(element):
 
     key, data = element
     logging.info(f"This is my raw data: {data}")
 
+    gmaps = googlemaps.Client(key=clv_gm)
+
     #Calculating distance between users and taxis
-    for user_lat, user_lng in data['users'][0]["userinit_lat"], data['users'][0]["userinit_lng"]:
-        for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
+    user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
+    taxi_position = data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"]
+    user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
 
-            user_PU_position = user_lat, user_lng
-            taxi_position = taxi_lat, taxi_lng
+    distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
+    distance_matrix_2 = gmaps.distance_matrix(user_init_position, user_final_position, mode='driving')
 
-            gmaps = googlemaps.Client(key=clv_gm) 
 
-            init_distance = gmaps.distance_matrix(user_PU_position, taxi_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+    init_distance = distance_matrix_1['rows'][0]['elements'][0]['distance']['value']
+    final_distance = distance_matrix_2['rows'][0]['elements'][0]['distance']['value']
 
     bq_element = {
         'user_id': data["users"][0]["user_id"],
@@ -69,9 +73,10 @@ def BusinessLogic(element):
         'userinit_lng' : data["users"][0]["userinit_lng"],
         'taxi_lat' : data["taxis"][0]["taxi_lat"],
         'taxi_lng' : data["taxis"][0]["taxi_lng"],
-        'init_distance': init_distance
-
-        #'init distance' : init_distance
+        'init_distance': init_distance,
+        'userfinal_lat' : data["users"][0]["userfinal_lat"],
+        'userfinal_lng' :  data["users"][0]["userfinal_lng"],
+        'final_distance' : final_distance
     }
 
     return bq_element
@@ -246,7 +251,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
             "taxis": taxi_data, 
             "users": user_data
             }) | beam.CoGroupByKey()
-            |"Business Logic" >> beam.Map(BusinessLogic)
+            |"Business Logic" >> beam.Map(CalculateDistances)
         )
 
         (
