@@ -13,47 +13,47 @@
     {
         "mode": "NULLABLE",
         "name": "userinit_lat",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "userinit_lng",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "taxi_lat",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "taxi_lng",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "init_distance",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "userfinal_lat",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "userfinal_lng",
-        "type": "STRING"
+        "type": "NUMERIC"
     },
     {
         "mode": "NULLABLE",
         "name": "final_distance",
-        "type": "STRING"
+        "type": "NUMERIC"
     }, 
     {
         "mode": "NULLABLE",
         "name": "total_distance",
-        "type": "STRING"
+        "type": "NUMERIC"
     }, 
     {
         "mode": "NULLABLE",
