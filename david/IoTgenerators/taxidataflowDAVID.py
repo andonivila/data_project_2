@@ -148,11 +148,6 @@ class CalculateTransactionAmount(beam.DoFn):
 class MatchShortestDistance(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
-                |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(30))
-                |"Get locations" >> beam.ParDo(getLocationsDoFn())
-                |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-                |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-                |"Calculate transaction amount" >> beam.ParDo(CalculateTransactionAmount())
                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
                 |"Group by user_id" >> beam.GroupByKey()
                 |"Find shortest distance" >> beam.Map(lambda x: {
