@@ -32,7 +32,7 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new user is looking for a taxi. Zone_id: %s", message['zone_id'])
+        logging.info("A new user is looking for a taxi. User_Id: %s", message['user_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
@@ -58,30 +58,15 @@ def generate_user_id():
 # Generate data function
 def generatedata():
 
-    # data={}
-    # data["user_id"] = generate_user_id()
-    # data["user_name"] = fake.name()
-    # data["user_phone_number"] = generate_phone_number()
-    # data["user_email"] = fake.email()
-    # data["userinit_lat"] = str(random.uniform(39.4, 39.5))
-    # data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
-    # data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
-    # data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
-    # data["zone_id"] = random.randint(1,3)
-
-    data={
-        "zone_id" : random.randint(1,5),
-        "payload" : {
-            "user_id" : generate_user_id(),
-            "user_name" : fake.name(),
-            "user_phone_number" : generate_phone_number(),
-            "user_email" : fake.email(),
-            "userinit_lat" : str(random.uniform(39.4, 39.5)), 
-            "userinit_lng" : str(random.uniform(-0.4, -0.3)),
-            "userfinal_lat" : str(random.uniform(39.4, 39.5)), 
-            "userfinal_lng": str(random.uniform(-0.4, -0.3))
-        }
-    }
+    data={}
+    data["user_id"] = generate_user_id()
+    data["user_name"] = fake.name()
+    data["user_phone_number"] = generate_phone_number()
+    data["user_email"] = fake.email()
+    data["userinit_lat"] = str(random.uniform(39.4, 39.5))
+    data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
+    data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
+    data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
 
     return data
 
@@ -97,7 +82,7 @@ def senddata(project_id, topic_name):
             pubsub_class.publishMessages(message)
 
             #it will be generated a transaction each 10 seconds
-            time.sleep(10)
+            time.sleep(random.randint(5, 30))
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:

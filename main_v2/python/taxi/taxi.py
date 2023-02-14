@@ -6,6 +6,7 @@ from faker import Faker
 from google.cloud import pubsub_v1
 import logging
 import string
+from datetime import datetime
 
 ###########################
 ### TAXI DATA GENERATOR ###
@@ -65,6 +66,21 @@ def generatedata():
     data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
     data["taxibase_fare"] = str(4.00)
     data["taxikm_fare"] = str(1.09)
+    data["zone_id"] = random.randint(1,3)
+    data["timestamp"] = str(datetime.now())
+
+    # data={
+    #     "zone_id" : random.randint(1,5),
+    #     "payload": {
+    #         "user_id": generate_user_id(),
+    #         "taxi_phone_number" : generate_phone_number(),
+    #         "taxi_lat" : str(random.uniform(39.4, 39.5)),
+    #         "taxi_lng" : str(random.uniform(-0.4, -0.3)),
+    #         "taxibase_fare" : str(random.uniform(39.4, 39.5)), 
+    #         "taxikm_fare" : str(random.uniform(-0.4, -0.3)),
+    #         "zone_id" : random.randint(1,5),
+    #         }
+    #     }
 
     return data
 
@@ -80,7 +96,7 @@ def senddata(project_id, topic_name):
             pubsub_class.publishMessages(message)
 
             #it will be generated a transaction each 10 seconds
-            time.sleep(random.randint(5, 30))
+            time.sleep(random.randint(5,20))
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:

@@ -6,9 +6,10 @@ from faker import Faker
 from google.cloud import pubsub_v1
 import logging
 import string
+from datetime import datetime
 
 ###########################
-### TAXI DATA GENERATOR ###
+### USER DATA GENERATOR ###
 ###########################
 
 fake = Faker()
@@ -17,7 +18,7 @@ fake = Faker()
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45.json" 
 
 project_id = "data-project-2-376316"
-topic_name = "taxi_position"
+topic_name = "user_position"
 
 ## PUB/SUB class declaration
 class PubSubMessages:
@@ -32,7 +33,7 @@ class PubSubMessages:
         json_str = json.dumps(message)
         topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
         self.publisher.publish(topic_path, json_str.encode("utf-8"))
-        logging.info("A new taxi is available. Taxi_Id: %s", message['taxi_id'])
+        logging.info("A new user is looking for a taxi. User_Id: %s", message['user_id'])
 
     def __exit__(self):
         self.publisher.transport.close()
@@ -54,17 +55,35 @@ def generate_user_id():
     user_id = ''.join(random.choice(letters_and_digits) for i in range(8))
     
     return user_id
-    
+
 # Generate data function
 def generatedata():
 
     data={}
-    data['taxi_id'] = generate_user_id()
-    data["taxi_phone_number"] = generate_phone_number()
-    data["taxi_lat"] = str(random.uniform(39.4, 39.5))
-    data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
-    data["taxibase_fare"] = str(4.00)
-    data["taxikm_fare"] = str(1.09)
+    data["user_id"] = generate_user_id()
+    data["user_name"] = fake.name()
+    data["user_phone_number"] = generate_phone_number()
+    data["user_email"] = fake.email()
+    data["userinit_lat"] = str(random.uniform(39.4, 39.5))
+    data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
+    data["userfinal_lat"] = str(random.uniform(39.4, 39.5))
+    data["userfinal_lng"] = str(random.uniform(-0.4, -0.3))
+    data["zone_id"] = random.randint(1,3)
+    data["timestamp"] = str(datetime.now())
+
+    # data={
+    #     "zone_id" : random.randint(1,5),
+    #     "payload" : {
+    #         "user_id" : generate_user_id(),
+    #         "user_name" : fake.name(),
+    #         "user_phone_number" : generate_phone_number(),
+    #         "user_email" : fake.email(),
+    #         "userinit_lat" : str(random.uniform(39.4, 39.5)), 
+    #         "userinit_lng" : str(random.uniform(-0.4, -0.3)),
+    #         "userfinal_lat" : str(random.uniform(39.4, 39.5)), 
+    #         "userfinal_lng": str(random.uniform(-0.4, -0.3))
+    #     }
+    # }
 
     return data
 
@@ -80,12 +99,12 @@ def senddata(project_id, topic_name):
             pubsub_class.publishMessages(message)
 
             #it will be generated a transaction each 10 seconds
-            time.sleep(random.randint(5, 30))
+            time.sleep(random.randint(5,20))
     except Exception as err:
         logging.error("Error while inserting data into out PubSub Topic: %s", err)
     finally:
         pubsub_class.__exit__()
     
 if __name__ == "__main__":
-        logging.getLogger().setLevel(logging.INFO) 
+        logging.getLogger().setLevel(logging.INFO)
         senddata(project_id, topic_name)
