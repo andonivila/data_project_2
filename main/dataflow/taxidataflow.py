@@ -49,12 +49,12 @@ def ParsePubSubMessage(message):
 
 def CalculateDistances(element):
 
-    import googlemaps
+    from googlemaps import Client
 
     key, data = element
     logging.info(f"This is my raw data: {data}")
 
-    gmaps = googlemaps.Client(key=clv_gm)
+    gmaps = Client(key=clv_gm)
 
     #Calculating distance between users and taxis
     user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
@@ -207,7 +207,7 @@ class AddFinalDistanceDoFn(beam.DoFn):
         
     
 '''Dataflow Process'''
-def run_pipeline(window_size = 1, num_shards = 5):
+def run_pipeline():
 
     # Input arguments
     parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Streaming Pipeline'))
@@ -216,6 +216,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
     parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.')
 
     args, pipeline_opts = parser.parse_known_args()
+    pipeline_opts['requirements_file'] = 'requirements.txt'
 
     #Load schema from /schema folder 
     with open(args.bigquery_schema_path) as file:
@@ -229,6 +230,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
 
     #Pipeline
     with beam.Pipeline(argv=pipeline_opts, options=options) as p:
+        p.run(options=PipelineOptions(flags=[], **pipeline_opts))
 
         ###Step01: Read user and taxi data from PUB/SUB
         user_data = (
@@ -253,7 +255,7 @@ def run_pipeline(window_size = 1, num_shards = 5):
             "taxis": taxi_data, 
             "users": user_data
             }) | beam.CoGroupByKey()
-            |"Business Logic" >> beam.Map(CalculateDistances)
+            |"Business Logic" >> beam.Map(CalculateDistances())
         )
 
         (

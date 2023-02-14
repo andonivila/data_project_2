@@ -1,1 +1,2 @@
 google-cloud-bigquery
+googlemaps==4.4.1

@@ -1,4 +1,4 @@
-import googlemaps
+from googlemaps import Client
 import os
 from google.cloud import bigquery
 from google.oauth2.service_account import Credentials
@@ -43,7 +43,7 @@ user_destination = Userfinal_lat, Userfinal_lng
 API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
 
 # Realiza una solicitud a la API de Google Maps
-gmaps = googlemaps.Client(key=API_KEY) 
+gmaps = Client(key=API_KEY) 
 
 # Obtiene la distancia en metros al usuario y la imprime
 resultinit = gmaps.distance_matrix(taxi_position, user_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
