@@ -9,6 +9,6 @@ setup(
     packages=find_packages(),
     install_requires=[
         'googlemaps',
-        'dotenv'
+        'python-dotenv'
     ]
 )
