@@ -130,7 +130,6 @@ def run_pipeline():
     parser.add_argument('--requirements_file', required=True, help='Path to rquirements.txt')
 
     args, pipeline_opts = parser.parse_known_args()
-    pipeline_opts['requirements_file'] = 'requirements.txt'
 
     #Load schema from /schema folder 
     with open(args.bigquery_schema_path) as file:
@@ -144,7 +143,6 @@ def run_pipeline():
 
     #Pipeline
     with beam.Pipeline(argv=pipeline_opts, options=options) as p:
-        p.run(options=PipelineOptions(flags=[], **pipeline_opts))
 
         ###Step01: Read user and taxi data from PUB/SUB
         user_data = (
