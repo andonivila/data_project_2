@@ -49,6 +49,8 @@ def ParsePubSubMessage(message):
 
 def CalculateDistances(element):
 
+    import googlemaps
+
     key, data = element
     logging.info(f"This is my raw data: {data}")
 
