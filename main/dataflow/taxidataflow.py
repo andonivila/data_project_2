@@ -83,7 +83,7 @@ def ClaculateDistances(element):
     taxibase_fare = data["taxis"][0]["taxibase_fare"]
 
     # Calculating total fare
-    partial_fare = taxikm_fare * (total_distance - 2500)
+    partial_fare = taxikm_fare * (total_distance/1000 - 2.5)
 
     if partial_fare > 0:
         total_fare = taxibase_fare + partial_fare
