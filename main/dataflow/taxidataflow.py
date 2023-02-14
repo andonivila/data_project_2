@@ -55,18 +55,42 @@ def ClaculateDistances(element):
 
     gmaps = Client(key=clv_gm)
 
-    #Calculating distance between users and taxis
+    ################################################
+    ###Calculate distance between users and taxis###
+    ################################################
+
+    # Extracting Variables
     user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
     taxi_position = (data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"])
     user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
 
+    # Calculating distances with distance matrix
     distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
     distance_matrix_2 = gmaps.distance_matrix(user_init_position, user_final_position, mode='driving')
 
-
+    # Accessing distance values
     init_distance = distance_matrix_1['rows'][0]['elements'][0]['distance']['value']
     final_distance = distance_matrix_2['rows'][0]['elements'][0]['distance']['value']
+    total_distance = init_distance + final_distance
 
+    ######################################
+    ### Calculate total journey amount ###
+    ######################################
+
+    # Extracting variables
+    taxikm_fare = data["taxis"][0]["taxikm_fare"]
+    taxibase_fare = data["taxis"][0]["taxibase_fare"]
+
+    # Calculating total fare
+    partial_fare = taxikm_fare * (total_distance - 2500)
+
+    if partial_fare > 0:
+        total_fare = taxibase_fare + partial_fare
+
+    else:
+        total_fare = taxibase_fare
+
+    # Format of the output message
     bq_element = {
         'user_id': data["users"][0]["user_id"],
         'taxi_id': data["taxis"][0]["taxi_id"],
@@ -77,7 +101,11 @@ def ClaculateDistances(element):
         'init_distance': init_distance,
         'userfinal_lat' : data["users"][0]["userfinal_lat"],
         'userfinal_lng' :  data["users"][0]["userfinal_lng"],
-        'final_distance' : final_distance
+        'final_distance' : final_distance,
+        'total_distance' : total_distance,
+        'taxibase_fare' : data["taxis"][0]["taxibase_fare"],
+        'taxikm_fare' : data["taxis"][0]["taxikm_fare"],
+        "transaction_amount" : total_fare
     }
 
     return bq_element
@@ -112,16 +140,6 @@ class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
         match = (pcoll
             |"Calculate distances" >> beam.Map(ClaculateDistances)
-            |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-            |"Group by user_id" >> beam.GroupByKey()
-            |"Find shortest distance" >> beam.Map(lambda x: {
-                'user_id': x[0],
-                #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-                'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-                'init_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-                'final_distance' : min(x[1], key=lambda y: y['init_distance'])['final_distance']
-            }
-            )
         )
 
         return match

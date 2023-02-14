@@ -7,17 +7,7 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "user_name",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_phone_number",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "user_email",
+        "name": "taxi_id",
         "type": "STRING"
     },
     {
@@ -32,41 +22,6 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "userfinal_lat",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "userfinal_lng",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "payment_method",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_id",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxi_phone_number",
-        "type": "STRING"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxibase_fare",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "taxikm_fare",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
         "name": "taxi_lat",
         "type": "STRING"
     },
@@ -77,27 +32,42 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "distance_to_user",
-        "type": "NUMERIC"
+        "name": "init_distance",
+        "type": "STRING"
     },
     {
         "mode": "NULLABLE",
-        "name": "distance_destination",
-        "type": "NUMERIC"
+        "name": "userfinal_lat",
+        "type": "STRING"
     },
+    {
+        "mode": "NULLABLE",
+        "name": "userfinal_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "final_distance",
+        "type": "STRING"
+    }, 
     {
         "mode": "NULLABLE",
         "name": "total_distance",
-        "type": "NUMERIC"
-    },
+        "type": "STRING"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "taxibase_fare",
+        "type": "STRING"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "taxikm_fare",
+        "type": "STRING"
+    }, 
     {
         "mode": "NULLABLE",
         "name": "transaction_amount",
-        "type": "NUMERIC"
-    },
-    {
-        "mode": "NULLABLE",
-        "name": "operation_id",
         "type": "STRING"
     }
     ]
