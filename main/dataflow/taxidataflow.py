@@ -46,42 +46,42 @@ def ParsePubSubMessage(message):
     #Return function
     return ('DP2',row)
 
+class CalculateDIstancesDoFn(beam.DoFn):
+    def process(self, element):
 
-def CalculateDistances(element):
+        from googlemaps import Client
 
-    from googlemaps import Client
+        key, data = element
+        logging.info(f"This is my raw data: {data}")
 
-    key, data = element
-    logging.info(f"This is my raw data: {data}")
+        gmaps = Client(key=clv_gm)
 
-    gmaps = Client(key=clv_gm)
+        #Calculating distance between users and taxis
+        user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
+        taxi_position = (data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"])
+        user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
 
-    #Calculating distance between users and taxis
-    user_init_position = (data["users"][0]["userinit_lat"], data["users"][0]["userinit_lng"])
-    taxi_position = (data["taxis"][0]["taxi_lat"], data["taxis"][0]["taxi_lng"])
-    user_final_position = (data["users"][0]["userfinal_lat"], data["users"][0]["userfinal_lng"])
-
-    distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
-    distance_matrix_2 = gmaps.distance_matrix(user_init_position, user_final_position, mode='driving')
+        distance_matrix_1 = gmaps.distance_matrix(user_init_position, taxi_position, mode='driving')
+        distance_matrix_2 = gmaps.distance_matrix(user_init_position, user_final_position, mode='driving')
 
 
-    init_distance = distance_matrix_1['rows'][0]['elements'][0]['distance']['value']
-    final_distance = distance_matrix_2['rows'][0]['elements'][0]['distance']['value']
+        init_distance = distance_matrix_1['rows'][0]['elements'][0]['distance']['value']
+        final_distance = distance_matrix_2['rows'][0]['elements'][0]['distance']['value']
 
-    bq_element = {
-        'user_id': data["users"][0]["user_id"],
-        'taxi_id': data["taxis"][0]["taxi_id"],
-        'userinit_lat' : data["users"][0]["userinit_lat"],
-        'userinit_lng' : data["users"][0]["userinit_lng"],
-        'taxi_lat' : data["taxis"][0]["taxi_lat"],
-        'taxi_lng' : data["taxis"][0]["taxi_lng"],
-        'init_distance': init_distance,
-        'userfinal_lat' : data["users"][0]["userfinal_lat"],
-        'userfinal_lng' :  data["users"][0]["userfinal_lng"],
-        'final_distance' : final_distance
-    }
+        bq_element = {
+            'user_id': data["users"][0]["user_id"],
+            'taxi_id': data["taxis"][0]["taxi_id"],
+            'userinit_lat' : data["users"][0]["userinit_lat"],
+            'userinit_lng' : data["users"][0]["userinit_lng"],
+            'taxi_lat' : data["taxis"][0]["taxi_lat"],
+            'taxi_lng' : data["taxis"][0]["taxi_lng"],
+            'init_distance': init_distance,
+            'userfinal_lat' : data["users"][0]["userfinal_lat"],
+            'userfinal_lng' :  data["users"][0]["userfinal_lng"],
+            'final_distance' : final_distance
+        }
 
-    return bq_element
+        return bq_element
 
 # def fill_none(element, default_value):
 #     if element is None:
@@ -182,28 +182,16 @@ class AddFinalDistanceDoFn(beam.DoFn):
 
 
 '''PTransform Classes'''
- 
-# class MatchShortestDistance(beam.PTransform):
-#     def expand(self, pcoll):
-#         match = (pcoll
-#                 |"Add Processing Time" >> beam.ParDo(AddTimestampDoFn())
-#                 |"Set fixed windows each 30 secs" >> beam.WindowInto(window.FixedWindows(60))
-#                 |"Group by timestamp" >> beam.GroupByKey()
-#                 |"Get locations" >> beam.ParDo(getLocationsDoFn())
-#                 |"Call Google maps API to calculate distances between user and taxis" >> beam.ParDo(CalculateInitDistancesDoFn())
-#                 |"Call Google maps API to calculate distances between user_init_loc and user_final_loc" >> beam.ParDo(CalculateFinalDistancesDoFn())
-#                 |"Key by user_id" >> beam.Map(lambda x: (x['user_id'], x))
-#                 |"Group by user_id" >> beam.GroupByKey()
-#                 | "Find shortest distance" >> beam.Map(lambda x: {
-#                     'user_id': x[0],
-#                     #Aqui podemos ir sacando los campos que queramos de la PColl inicial
-#                     'taxi_id': min(x[1], key=lambda y: y['init_distance'])['taxi_id'],
-#                     'calculate shortest_distance': min(x[1], key=lambda y: y['init_distance'])['init_distance'],
-#                     'calculate final distance': min(x[1], key=lambda y: y['init_distance'])['final_distance']
-#                 })
-#             )
 
-#         return match
+class BussinessLogic(beam.PTransform):
+    def expand(self, pcoll):
+        match = (pcoll
+            |"Calculate distances" >> beam.ParDo(CalculateDIstancesDoFn())
+    
+        )
+
+        return match
+
         
     
 '''Dataflow Process'''
@@ -255,7 +243,7 @@ def run_pipeline():
             "taxis": taxi_data, 
             "users": user_data
             }) | beam.CoGroupByKey()
-            |"Business Logic" >> beam.Map(CalculateDistances())
+            |"Business Logic" >> BussinessLogic()
         )
 
         (
