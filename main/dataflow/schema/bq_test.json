@@ -12,7 +12,22 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "init_distance",
+        "name": "userinit_lat",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "userinit_lng",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_lat",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_lng",
         "type": "STRING"
     }
     ]

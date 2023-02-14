@@ -52,21 +52,28 @@ def BusinessLogic(element):
     logging.info(f"This is my raw data: {data}")
 
     # Calculating distance between users and taxis
-    for user_lat, user_lng in data['users'][0]["user_init_lat"], data['users'][0]["user_init_lng"]:
-        for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
+    # for user_lat, user_lng in data['users'][0]["user_init_lat"], data['users'][0]["user_init_lng"]:
+    #     for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
 
-            user_PU_position = user_lat, user_lng
-            taxi_position = taxi_lat, taxi_lng
+            # user_PU_position = user_lat, user_lng
+            # taxi_position = taxi_lat, taxi_lng
 
-            gmaps = googlemaps.Client(key=clv_gm) 
+            # gmaps = googlemaps.Client(key=clv_gm) 
 
-            init_distance = gmaps.distance_matrix(taxi_position, user_PU_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+            # init_distance = gmaps.distance_matrix(user_PU_position, taxi_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
     bq_element = {
-        'user_id': data['users'][0]["user_id"],
-        'taxi_id': data['taxis'][0]["taxi_id"],
-        'init distance' : init_distance
+        'user_id': data["users"][0]["user_id"],
+        'taxi_id': data["taxis"][0]["taxi_id"],
+        'user_init_lat' : data["users"][0]["userinit_lat"],
+        'user init_lng' : data["users"][0]["userinit_lng"],
+        'taxi_lat' : data["taxis"][0]["taxi_lat"],
+        'taxi_lng' : data["taxis"][0]["taxi_lng"],
+
+        #'init distance' : init_distance
     }
+
+    return bq_element
 
 # def fill_none(element, default_value):
 #     if element is None:
