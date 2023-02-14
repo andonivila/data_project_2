@@ -2,6 +2,7 @@ from googlemaps import Client
 import os
 from google.cloud import bigquery
 from google.oauth2.service_account import Credentials
+from config import clv_gm
 
 # Autentificar con BigQuery usando las credenciales de la cuenta de servicio
 #credentials = Credentials.from_service_account_file("./dataflow/data-project-2-376316-6817462f9a56.json")
@@ -40,10 +41,10 @@ user_position  = Userinit_lat, Userinit_lng
 user_destination = Userfinal_lat, Userfinal_lng
 
 # Introducir la API_KEY de Google Maps
-API_KEY = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+#API_KEY = 'AIzaSyCEHqhg1isp6pTYETNCZ8X_6kGPjhzZfEY'
 
 # Realiza una solicitud a la API de Google Maps
-gmaps = Client(key=API_KEY) 
+gmaps = Client(key=clv_gm) 
 
 # Obtiene la distancia en metros al usuario y la imprime
 resultinit = gmaps.distance_matrix(taxi_position, user_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
