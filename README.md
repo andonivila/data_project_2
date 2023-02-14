@@ -1,8 +1,8 @@
 # ÍNDICE
 ## 1. Generador de datos taxi
 ## 2. Generador de datos user
-## 3. Dataflow
-##
+## 3. Estructura Dataflow
+## 4. Visualización
 
 # 1.GENERADOR DE DATOS TAXI
 
@@ -19,7 +19,7 @@ from google.cloud import pubsub_v1
 import logging
 import string
 
-#Se importan las librerias necearias para poder ejecutar el codigo correctamente
+#Se importan las librerias necesarias para poder ejecutar el código correctamente.
 ```
 ### 1.1.2. Variables 
 ```python
@@ -31,7 +31,10 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45
 project_id = "data-project-2-376316"
 topic_name = "taxi_position"
 
-# Se declaran las variables inciales. Por un lado "os.environ", donde se representa un diccionario que contiene las variables de entorno del sistema operativo en formato JSON. "project_id", es el nombre del proyecto en google cloud donde se va a a desarrollar la estructura de dataflow a posteriori, y finalmente el topic_name, será donde estarán destinados los mensajes a enviarse para guardarse en Pub/Sub
+# Se declaran las variables iniciales. Por un lado "os.environ", donde se representa un diccionario que 
+# contiene las variables de entorno del sistema operativo en formato JSON. "project_id", es el nombre 
+# del proyecto en google cloud donde se va a a desarrollar la estructura de dataflow a posteriori, y 
+# finalmente el topic_name, será donde estarán destinados los mensajes a enviarse para guardarse en Pub/Sub
 ```
 ## 1.2.Funciones y clases
 
@@ -311,7 +314,7 @@ if __name__ == "__main__":
 #Mediante está funcion se ejecuta la función sendata creada justo antes, la cual coge las dos variables declaradas al principio del script, "project_id" y "topic_name"
 ```
 
-# ESTRUCTURA TAXI DATAFLOW
+# ESTRUCTURA DATAFLOW
 ## Importar librerias BEAM
 En primer lugar se importarán las librearías neceasrias para poder ejecutar en el entorno BEAM
 
