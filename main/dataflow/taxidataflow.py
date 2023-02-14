@@ -65,8 +65,8 @@ def BusinessLogic(element):
     bq_element = {
         'user_id': data["users"][0]["user_id"],
         'taxi_id': data["taxis"][0]["taxi_id"],
-        'user_init_lat' : data["users"][0]["userinit_lat"],
-        'user init_lng' : data["users"][0]["userinit_lng"],
+        'userinit_lat' : data["users"][0]["userinit_lat"],
+        'userinit_lng' : data["users"][0]["userinit_lng"],
         'taxi_lat' : data["taxis"][0]["taxi_lat"],
         'taxi_lng' : data["taxis"][0]["taxi_lng"],
 
