@@ -34,7 +34,8 @@ topic_name = "taxi_position"
 # Se declaran las variables iniciales. Por un lado "os.environ", donde se representa un diccionario que 
 # contiene las variables de entorno del sistema operativo en formato JSON. "project_id", es el nombre 
 # del proyecto en google cloud donde se va a a desarrollar la estructura de dataflow a posteriori, y 
-# finalmente el topic_name, será donde estarán destinados los mensajes a enviarse para guardarse en Pub/Sub
+# finalmente el topic_name, será donde 
+# estarán destinados los mensajes a enviarse para guardarse en Pub/Sub
 ```
 ## 1.2.Funciones y clases
 
@@ -58,7 +59,8 @@ class PubSubMessages:
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
-#Se crea una clase denominada "PubSubMessages", la cual contiene tres funciones: una de inicialización, otra de ejecución de la clase y finalmente una de finalización.
+#Se crea una clase denominada "PubSubMessages", la cual contiene tres funciones: una de inicialización, 
+# otra de ejecución de la clase y finalmente una de finalización.
 
 #En la de ejecución, introducciendo dos parámetros como el message:
 def publishMessages(self, message):
@@ -73,9 +75,13 @@ topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
 #se determinada la ruta donde estára el tópico dentro de un id_project creado al cual hacer referencia. 
 
 #Finalmente con:
-self.publisher.publish(topic_path, json_str.encode("utf-8"))logging.info("A new taxi is available. Zone_id: %s", message['zone_id'])
+self.publisher.publish(topic_path, json_str.encode("utf-8"))logging.info
 
-#"El primer argumento, topic_path, es la ruta del tópico en Google Cloud Pub/Sub al que se quiere publicar el mensaje. El segundo argumento, json_str.encode("utf-8"), es el contenido del mensaje codificado como una secuencia de bytes en formato UTF-8.
+("A new taxi is available. Zone_id: %s", message['zone_id'])
+
+#"El primer argumento, topic_path, es la ruta del tópico en Google Cloud Pub/Sub al que se quiere publicar
+#  el mensaje. 
+# El segundo argumento, json_str.encode("utf-8"), es el contenido del mensaje codificado como una secuencia de bytes en formato UTF-8.
 ```
 
 ### 1.2.2. Funcion generar un telefono aleatorio español
@@ -117,7 +123,7 @@ data={
 
     return data
 
-#Finalmente por cada conductor de taxi, se obtendrán las variables: zone_id, ubicación del taxi delimitado por taxi_lat y taxi_lng, precio del taxi mediante taxibse_fare y taxikm_fare
+#Finalmente por cada conductor de taxi, se obtendrán las variables: zone_id, ubicación del taxi delimitado por taxi_lat y taxi_lng, precio del taxi mediante taxibase_fare y taxikm_fare
 ```
 
 ### 1.2.5. Enviar el mensaje al tópico de PUB/SUB
@@ -192,7 +198,7 @@ from google.cloud import pubsub_v1
 import logging
 import string
 
-#Se importan las librerias necearias para poder ejecutar el codigo correctamente
+#Se importan las librerias necesarias para poder ejecutar el codigo correctamente
 ```
 ### 2.1.2. Variables
 ```python
@@ -201,7 +207,11 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="data-project-2-376316-a19138ce1e45
 project_id = "data-project-2-376316"
 topic_name = "user_position"
 
-# Se declaran las variables inciales. Por un lado "os.environ", donde se representa un diccionario que contiene las variables de entorno del sistema operativo en formato JSON. "project_id", es el nombre del proyecto en google cloud donde se va a a desarrollar la estructura de dataflow a posteriori, y finalmente el topic_name, será donde estarán destinados los mensajes a enviarse para guardarse en Pub/Sub
+# Se declaran las variables iniciales. Por un lado "os.environ", donde se representa un diccionario 
+# que contiene las variables de entorno del sistema operativo en formato JSON. "project_id", 
+# es el nombre del proyecto en google cloud donde se va a a desarrollar la estructura de dataflow 
+# a posteriori, y finalmente el topic_name, será donde estarán destinados los
+# mensajes a enviarse para guardarse en Pub/Sub
 ```
 ## 2.2 Funciones y clases
 ### 2.1. Clase para mandar mensajes a PubSub
@@ -223,7 +233,8 @@ class PubSubMessages:
     def __exit__(self):
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
-#Se crea una clase denominada "PubSubMessages", la cual contiene tres funciones: una de inicialización, otra de ejecución de la clase y finalmente una de finalización.
+# Se crea una clase denominada "PubSubMessages", la cual contiene tres funciones: 
+# una de inicialización, otra de ejecución de la clase y finalmente una de finalización.
 
 #En la de ejecución, introducciendo dos parámetros como el message:
 def publishMessages(self, message):
@@ -241,7 +252,9 @@ topic_path = self.publisher.topic_path(self.project_id, self.topic_name)
 self.publisher.publish(topic_path, json_str.encode("utf-8"))
         logging.info("A new user is looking for a taxi. Zone_id: %s", message['zone_id'])
 
-#"El primer argumento, topic_path, es la ruta del tópico en Google Cloud Pub/Sub al que se quiere publicar el mensaje. El segundo argumento, json_str.encode("utf-8"), es el contenido del mensaje codificado como una secuencia de bytes en formato UTF-8.
+# "El primer argumento, topic_path, es la ruta del tópico en Google Cloud Pub/Sub al que se quiere publicar
+# el mensaje. El segundo argumento, json_str.encode("utf-8"), es el contenido del mensaje 
+# codificado como una secuencia de bytes en formato UTF-8.
 ```
 ### 2.2. Funcion generar un telefono aleatorio español
 ```python
@@ -283,7 +296,8 @@ def generatedata():
 
     return data
 
-#Finalmente por cada usuario, se obtendrán las variables: zone_id, user_id, user_name, user_phone_number,user_email,userinit_lat,userinit_lng,userfinal_lat,userfinal_lng
+# Finalmente por cada usuario, se obtendrán las variables: zone_id, user_id, user_name, 
+# user_phone_number,user_email,userinit_lat,userinit_lng,userfinal_lat,userfinal_lng
 ```
 ## 2.5. Enviar el mensaje al tópico de PUB/SUB
 ```python
@@ -304,14 +318,16 @@ def senddata(project_id, topic_name):
     finally:
         pubsub_class.__exit__()
 
-#El código es el mismo que en taxi, por lo que no se va a volver a explicar cada parte porque ya se explicó en taxi
+# El código es el mismo que en taxi, por lo que no se va a volver a explicar cada
+# parte porque ya se explicó en taxi
 ```
 ```python
 if __name__ == "__main__":
         logging.getLogger().setLevel(logging.INFO) 
         senddata(project_id, topic_name)
 
-#Mediante está funcion se ejecuta la función sendata creada justo antes, la cual coge las dos variables declaradas al principio del script, "project_id" y "topic_name"
+# Mediante está funcion se ejecuta la función sendata creada justo antes, la cual 
+# coge las dos variables declaradas al principio del script, "project_id" y "topic_name"
 ```
 
 # ESTRUCTURA DATAFLOW
@@ -377,15 +393,15 @@ def ParsePubSubMessage(message):
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
     #Return function
     return row
+
+# Esta función hace referencia a la manera en la que se va a publicar los mensajes en PubSub
+
+# En primer lugar, se van covertir en unicode mediante ".decode(utf-8)" y se guardará en la varibale pubsubmessage
+
+# A continuación se cargan los mensajes en formato json mediante la función pubsubmessage
+
+# Finalmente, se realiza un "loggin.info" de manera que se notifique cada vez que se envia el mensaje para poder observar la evolución y detectar errores
 ```
-Esta función hace referencia a la manera en la que se va a publicar los mensajes en PubSub
-
-En primer lugar, se van covertir en unicode mediante ".decode(utf-8)" y se guardará en la varibale pubsubmessage
-
-A continuación se cargan los mensajes en formato json mediante la función pubsubmessage
-
-Finalmente, se realiza un "loggin.info" de manera que se notifique cada vez que se envia el mensaje para poder observar la evolución y detectar errores
-
 ```python
 class MatchShortestDistance(beam.PTransform):
 
@@ -407,21 +423,27 @@ class MatchShortestDistance(beam.PTransform):
         closest_taxi_index = distances.index(shortest_distance)
 
         return (User_id, (Taxi_id[closest_taxi_index], shortest_distance))
+
+
+# En este caso, se crea una clase que será hacer una coincidencia entre el usuario y el taxi más cercano.
+
+# Esto va a estar compuesto por incializar la clase, una función expand y finalmente la función "_find_closest_match"
+
+# En referencia a la funcion "expand", se divide en dos partes. Por un lado "util.group_by_key()"
+# que agrupa a por clave valor, y por otro lado "util.Map(self._find_closest_match)" 
+# que mediane la función map hace un llamamiento a la función "_find_closest_match"
+# para poder hacer la conincidencia del taxi más cercano y el cliente y devuelve finalmente una nueva pcollection.
+
+# A continuación es necesario porque se utiliza ".map" y ".ParDo". 
+
+# Básicamente se utiliza ".map" para tareas de procesamiento simples y secuenciales que
+# no requieren un manejo complejo de los errores o las situaciones excepcionales.
+
+# En cambio ".ParDo" para tareas más complejas y que requieren un control más fino sobre el procesamiento de los elementos.
+
+# En nuestro caso se va a utilizar "ParDo" con el fin de tener un mayor control y por ello
+# las clases serán creadas con "beam.DoFn" como veremos más adelante
 ```
-
-En este caso, se crea una clase que será hacer una coincidencia entre el usuario y el taxi más cercano.
-
-Esto va a estar compuesto por incializar la clase, una función expand y finalmente la función "_find_closest_match"
-
-En referencia a la funcion "expand", se divide en dos partes. Por un lado "util.group_by_key()" que agrupa a por clave valor, y por otro lado "util.Map(self._find_closest_match)" que mediane la función map hace un llamamiento a la función "_find_closest_match" para poder hacer la conincidencia del taxi más cercano y el cliente y devuelve finalmente una nueva pcollection.
-
-A continuación es necesario porque se utiliza ".map" y ".ParDo". 
-
-Básicamente se utiliza ".map" para tareas de procesamiento simples y secuenciales que no requieren un manejo complejo de los errores o las situaciones excepcionales.
-
-En cambio ".ParDo" para tareas más complejas y que requieren un control más fino sobre el procesamiento de los elementos.
-
-En nuestro caso se va a utilizar "ParDo" con el fin de tener un mayor control y por ello las clases serán creadas con "beam.DoFn" como veremos más adelante
 
 ## Clases 
 ```python
@@ -432,19 +454,20 @@ class AddTimestampDoFn(beam.DoFn):
         #Add Processing time field
         element['Processing_Time'] = str(datetime.now())
         yield element
-``` 
-En este caso la función hara referencia a que se modificará el type de la variable element en su columna "Porcessing time" por una de carácter string
 
+# En este caso la función hara referencia a que se modificará el type de la variable
+# element en su columna "Porcessing time" por una de carácter string
+```
 ```python
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
     def process(self, element):
         
         yield element['taxi_id', 'taxi_lat', 'taxi_lng', 'user_id', 'userinit_lat', 'userinit_lng', 'userfinal_lat', 'userfinal_lng']
+
+
+# Mediante esta función, nos devolvería cual sería la posición geográfica tanto del taxi como del usario
 ```
-
-Mediante esta función, nos devolvería cual sería la posición geográfica tanto del taxi como del usario
-
 ``` python
 class CalculateInitDistancesDoFn(beam.DoFn):
     def process(self, element):
@@ -464,9 +487,12 @@ class CalculateInitDistancesDoFn(beam.DoFn):
         element['init_distance'] = gmaps.distance_matrix(taxi_position, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
         yield element
-```
 
-Con esta función conseguiremos calcular cuál es la distancia entre el usuairo y el taxi. Más adelante se verá como no es únicamente medirá la distancia de un usuario a un taxi, si no que recogerá la ubicación de todos los taxis y calculará la distancia con la API de Google Maps que es la siguiente clase:
+
+#Con esta función conseguiremos calcular cuál es la distancia entre el usuario y el taxi. 
+# Más adelante se verá como no es únicamente medirá la distancia de un usuario a un taxi,
+# si no que recogerá la ubicación de todos los taxis y calculará la distancia con la API de Google Maps que es la siguiente clase:
+```
 
 ``` python
 class CalculateFinalDistancesDoFn(beam.DoFn):
@@ -489,10 +515,12 @@ class CalculateFinalDistancesDoFn(beam.DoFn):
         element['final_distance'] = gmaps.distance_matrix(user_destination, user_intit_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
 
         yield element
-```
-Una vez se haya calculado la distancia y guardada como una clave más, se procederá a eliminar las posiciones geográficas de los taxis, así como los usuarios ya que no son necearias
 
-De esa manera conseguiremos obtener finalmente en "BigQuery" únicamente los datos realmente útiles.
+# Una vez se haya calculado la distancia y guardada como una clave más, se procederá a 
+# eliminar las posiciones geográficas de los taxis, así como los usuarios ya que no son necearias.
+
+# De esa manera conseguiremos obtener finalmente en "BigQuery" únicamente los datos realmente útiles.
+```
 
 ``` python
 class RemoveLocations(beam.DoFn):
@@ -568,9 +596,10 @@ def run_pipeline():
         )
         
 
-```
-Este código es el que se va a utlizar para procesar datos en tiempo real. Se trata de un pipeline de flujo de datos en tiempo real para integrar datos de usuarios y taxis.
 
+# Este código es el que se va a utlizar para procesar datos en tiempo real. 
+# Se trata de un pipeline de flujo de datos en tiempo real para integrar datos de usuarios y taxis.
+```
 Linea por linea:
 ```python
 def run_pipeline(): #se define una función llamada run_pipeline que ejecutará el pipeline de Apache Beam.
@@ -586,12 +615,14 @@ parser = argparse.ArgumentParser(description=('Arguments for the Dataflow Stream
 ```python
 parser.add_argument('--output_bigquery', required=True, help='Table where data will be stored in BigQuery. Format: <dataset>.<table>.') 
 
-#Se agrega un argumento llamado output_bigquery que es obligatorio y proporciona la tabla de destino en BigQuery donde se almacenarán los datos. El formato de la tabla es <dataset>.<table>.
+#Se agrega un argumento llamado output_bigquery que es obligatorio y proporciona
+# la tabla de destino en BigQuery donde se almacenarán los datos. El formato de la tabla es <dataset>.<table>.
 ```
 ```python
 parser.add_argument('--bigquery_schema_path', required=True, help='BigQuery Schema Path within the repository.') 
 
-#Se agrega otro argumento llamado bigquery_schema_path que es obligatorio y proporciona la ruta del esquema de BigQuery dentro del repositorio.
+#Se agrega otro argumento llamado bigquery_schema_path que es obligatorio 
+# y proporciona la ruta del esquema de BigQuery dentro del repositorio.
 ```
 
 ``` python
@@ -637,7 +668,10 @@ user_data = (p |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscript
                 |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
         )
 
-#Se crea una PCollection llamada "Read User data from PubSUb" lee datos de la suscripción que incluye los atributos del mensaje. Mediante la llamada a lafuncion beam.Map(ParseSubMessage) almacena los datos de usuario en formato JSON. Finalmente con la "window into data", definimos el tamaño de la ventana en segundos y el número de particiones para el procesado de datos en paralelo
+#Se crea una PCollection llamada "Read User data from PubSUb" lee datos de la suscripción que incluye los atributos del mensaje.
+# Mediante la llamada a lafuncion beam.Map(ParseSubMessage) almacena los datos de usuario en formato JSON. 
+# Finalmente con la "window into data", definimos el tamaño de la ventana en segundos
+# y el número de particiones para el procesado de datos en paralelo
 ```
 ``` python
 taxi_data = (
@@ -657,7 +691,8 @@ data = (
             |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
             |
 
-# En este caso se hace una agrupación "GroupByKey" en cuanto a la tabla de taxis por taxi_data y luego en cuanto a users por user_data que son las pcollection creadas anteriormente
+# En este caso se hace una agrupación "GroupByKey" en cuanto a la tabla de taxis por 
+# taxi_data y luego en cuanto a users por user_data que son las pcollection creadas anteriormente
 ```
 
 ```python
@@ -669,7 +704,8 @@ data = (
                 write_disposition = beam.io.BigQueryDisposition.WRITE_APPEND
             )
         )
-# En este caso se está realizando una acción para poder escribir en BigQuery y representar en una tabla los datos más relevantes de los usuarios así como de los taxis.
+# En este caso se está realizando una acción para poder escribir en BigQuery y 
+# representar en una tabla los datos más relevantes de los usuarios así como de los taxis.
 ```
 
 ```python
