@@ -44,7 +44,29 @@ def ParsePubSubMessage(message):
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
 
     #Return function
-    return row
+    return ('DP2',row)
+
+def BusinessLogic(element):
+
+    key, data = element
+    logging.info(f"This is my raw data: {data}")
+
+    # Calculating distance between users and taxis
+    for user_lat, user_lng in data['users'][0]["user_init_lat"], data['users'][0]["user_init_lng"]:
+        for taxi_lat, taxi_lng in data['taxis'][0]["taxi_lat"], data['taxis'][0]["taxi_lng"]:
+
+            user_PU_position = user_lat, user_lng
+            taxi_position = taxi_lat, taxi_lng
+
+            gmaps = googlemaps.Client(key=clv_gm) 
+
+            init_distance = gmaps.distance_matrix(taxi_position, user_PU_position, mode='driving')["rows"][0]["elements"][0]['distance']["value"]
+
+    bq_element = {
+        'user_id': data['users'][0]["user_id"],
+        'taxi_id': data['taxis'][0]["taxi_id"],
+        'init distance' : init_distance
+    }
 
 # def fill_none(element, default_value):
 #     if element is None:
@@ -61,11 +83,6 @@ class AddTimestampDoFn(beam.DoFn):
         #Add Processing time field
         element['processing_time'] = str(datetime.now())
         yield element
-
-##DoFn02: Extract payload
-class extractPayloadDoFn(beam.DoFn):
-    def process(self, element):
-        yield element[1]
 
 #DoFn02: Get the location fields
 class getLocationsDoFn(beam.DoFn):
@@ -172,24 +189,6 @@ class AddFinalDistanceDoFn(beam.DoFn):
 #             )
 
 #         return match
-
-class GroupMessagesByFixedWindows(beam.PTransform):
-    """A composite transform that groups Pub/Sub messages based on publish time
-    and outputs a list of tuples, each containing a message and its publish time.
-    """
-    def __init__(self, window_size, num_shards=5):
-        # Set window size to 30 seconds.
-        self.window_size = int(window_size * 30)
-        self.num_shards = num_shards
-
-    def expand(self, pcoll):
-        return (
-            pcoll
-            # Bind window info to each element using element timestamp (or publish time).
-            | "Window into fixed intervals">> beam.WindowInto(window.FixedWindows(self.window_size))
-            | "Add timestamp to windowed elements" >> beam.ParDo(AddTimestampDoFn())
-                                    
-        )
         
     
 '''Dataflow Process'''
@@ -221,25 +220,25 @@ def run_pipeline(window_size = 1, num_shards = 5):
             p 
                 |"Read User data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_user_subscription}", with_attributes = True)
                 |"Parse User JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Window into data" >> GroupMessagesByFixedWindows(window_size, num_shards)
+                |"Set fixed window_Users" >>  beam.WindowInto(window.FixedWindows(60))
         )
 
         taxi_data = (
             p
                 |"Read Taxi data from PubSub" >> beam.io.ReadFromPubSub(subscription=f"projects/{project_id}/subscriptions/{input_taxi_subscription}", with_attributes = True)
                 |"Parse Taxi JSON messages" >> beam.Map(ParsePubSubMessage)
-                |"Window into taxi" >> GroupMessagesByFixedWindows(window_size, num_shards)
+                |"Set fixed window_Taxis" >>  beam.WindowInto(window.FixedWindows(60))
                 
         )
 
         ###Step02: Merge Data from taxi and user topics into one PColl
         # Here we have taxi and user data in the same  table
 
-        data = (
-            {"taxis": taxi_data, "users": user_data} | beam.CoGroupByKey()
-            |"Extract Payload" >> beam.ParDo(extractPayloadDoFn())
-            #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
-            #|"Get shortest distance between user and taxis" >> MatchShortestDistance()
+        data = (({
+            "taxis": taxi_data, 
+            "users": user_data
+            }) | beam.CoGroupByKey()
+            |"Business Logic" >> beam.Map(BusinessLogic)
         )
 
         (

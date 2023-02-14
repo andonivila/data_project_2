@@ -58,27 +58,13 @@ def generate_user_id():
 # Generate data function
 def generatedata():
 
-    # data={}
-    # data['taxi_id'] = generate_user_id()
-    # data["taxi_phone_number"] = generate_phone_number()
-    # data["taxi_lat"] = str(random.uniform(39.4, 39.5))
-    # data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
-    # data["taxibase_fare"] = str(4.00)
-    # data["taxikm_fare"] = str(1.09)
-    # data["zone_id"] = random.randint(1,3)
-
-    data={
-        "zone_id" : random.randint(1,5),
-        "payload": {
-            "user_id": generate_user_id(),
-            "taxi_phone_number" : generate_phone_number(),
-            "taxi_lat" : str(random.uniform(39.4, 39.5)),
-            "taxi_lng" : str(random.uniform(-0.4, -0.3)),
-            "taxibase_fare" : str(random.uniform(39.4, 39.5)), 
-            "taxikm_fare" : str(random.uniform(-0.4, -0.3)),
-            "zone_id" : random.randint(1,5),
-            }
-        }
+    data={}
+    data['taxi_id'] = generate_user_id()
+    data["taxi_phone_number"] = generate_phone_number()
+    data["taxi_lat"] = str(random.uniform(39.4, 39.5))
+    data["taxi_lng"] = str(random.uniform(-0.4, -0.3))
+    data["taxibase_fare"] = str(4.00)
+    data["taxikm_fare"] = str(1.09)
 
     return data
 
