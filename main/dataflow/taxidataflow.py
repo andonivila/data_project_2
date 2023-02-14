@@ -16,6 +16,7 @@ from apache_beam.io.gcp.bigquery import parse_table_schema_from_json
 from apache_beam.io.gcp import bigquery_tools
 
 #Import Common Libraries
+from dotenv import load_dotenv
 import argparse
 import json
 import logging
@@ -27,10 +28,10 @@ project_id = "data-project-2-376316"
 input_taxi_subscription = "taxi_position-sub"
 input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
-clv_gm = "AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U"
 
-#Indicamos clave Google Maps
-#clv_gm = os.environ ['clv_gm']
+# Enter the Google Maps API_KEY
+load_dotenv()
+clv_gm = str(os.environ['CLAVE_API_GOOGLE_MAPS'])
 
 '''Functions'''
 def ParsePubSubMessage(message):
@@ -52,7 +53,7 @@ def CalculateDistances(element):
 
     key, data = element
     logging.info(f"This is my raw data: {data}")
-
+    
     gmaps = Client(key=clv_gm)
 
     ################################################
