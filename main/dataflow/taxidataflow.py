@@ -30,8 +30,10 @@ input_user_subscription = "user_position-sub"
 output_topic = "surge_pricing"
 
 # Enter the Google Maps API_KEY
-load_dotenv()
-clv_gm = os.getenv('CLAVE_API_GOOGLE_MAPS')
+# load_dotenv()
+# clv_gm = os.getenv('CLAVE_API_GOOGLE_MAPS')
+clv_gm = 'AIzaSyBMazxFGKqM5rDVWyDiFSpESzqjLNgjY4U'
+
 
 '''Functions'''
 def ParsePubSubMessage(message):
@@ -43,6 +45,7 @@ def ParsePubSubMessage(message):
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
     #Return function
     return ('DP2',row)
+
 
 #Function to calculate total distance and the total amount of the journey
 def CalculateDistances(element):
