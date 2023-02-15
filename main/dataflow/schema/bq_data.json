@@ -13,22 +13,22 @@
     {
         "mode": "NULLABLE",
         "name": "userinit_lat",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
         "name": "userinit_lng",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
         "name": "taxi_lat",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
         "name": "taxi_lng",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
@@ -38,12 +38,12 @@
     {
         "mode": "NULLABLE",
         "name": "userfinal_lat",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
         "name": "userfinal_lng",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     },
     {
         "mode": "NULLABLE",
@@ -53,22 +53,27 @@
     {
         "mode": "NULLABLE",
         "name": "total_distance",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     }, 
     {
         "mode": "NULLABLE",
         "name": "taxibase_fare",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     }, 
     {
         "mode": "NULLABLE",
         "name": "taxikm_fare",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
     }, 
     {
         "mode": "NULLABLE",
         "name": "transaction_amount",
-        "type": "NUMERIC"
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "timestamp",
+        "type": "STRING"
     }
     ]
 }
