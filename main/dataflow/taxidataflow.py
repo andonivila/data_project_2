@@ -122,7 +122,7 @@ class AddTimestampDoFn(beam.DoFn):
         from datetime import datetime
         #Add Processing time field
         element['processing_time'] = str(datetime.now())
-        yield element
+        return element
 
 
 
