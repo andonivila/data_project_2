@@ -73,7 +73,7 @@
     {
         "mode": "NULLABLE",
         "name": "processing_time",
-        "type": "FLOAT64"
+        "type": "STRING"
     }
     ]
 }
