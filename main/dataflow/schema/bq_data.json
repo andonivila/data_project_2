@@ -69,6 +69,11 @@
         "mode": "NULLABLE",
         "name": "transaction_amount",
         "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "processing_time",
+        "type": "FLOAT64"
     }
     ]
 }
