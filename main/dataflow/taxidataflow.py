@@ -49,7 +49,9 @@ def ParsePubSubMessage(message):
 
 #Function to calculate total distance and the total amount of the journey
 def CalculateDistances(element):
+
     from googlemaps import Client
+    from datetime import datetime
 
     key, data = element
     logging.info(f"This is my raw data: {data}")
@@ -93,20 +95,39 @@ def CalculateDistances(element):
 
     # Format of the output message
     bq_element = {
+
+        # User and taxi ids
         'user_id': data["users"][0]["user_id"],
         'taxi_id': data["taxis"][0]["taxi_id"],
+
+        # User pick up position
         'userinit_lat' : float(data["users"][0]["userinit_lat"]),
         'userinit_lng' : float(data["users"][0]["userinit_lng"]),
+
+        # Taxi position
         'taxi_lat' : float(data["taxis"][0]["taxi_lat"]),
         'taxi_lng' : float(data["taxis"][0]["taxi_lng"]),
+
+        # Distance from user to taxi
         'init_distance': float(init_distance),
+
+        # User drop off position
         'userfinal_lat' : float(data["users"][0]["userfinal_lat"]),
         'userfinal_lng' :  float(data["users"][0]["userfinal_lng"]),
+
+        # Distance from user pick up loc to user drop off loc
         'final_distance' : final_distance,
+
+        # Total taxi's journey distance
         'total_distance' : total_distance,
+
+        # Payment data
         'taxibase_fare' : data["taxis"][0]["taxibase_fare"],
         'taxikm_fare' : data["taxis"][0]["taxikm_fare"],
-        "transaction_amount" : total_fare
+        "transaction_amount" : total_fare,
+
+        # Processing time
+        "timestamp" : str(datetime.now())
     }
 
     return bq_element
@@ -114,15 +135,15 @@ def CalculateDistances(element):
 
 '''DoFn Classes'''
 
-#DoFn01: Add processing timestamp
-class AddTimestampDoFn(beam.DoFn):
+# #DoFn01: Add processing timestamp
+# class AddTimestampDoFn(beam.DoFn):
 
-    #Process function to deal with data
-    def process(self, element):
-        from datetime import datetime
-        #Add Processing time field
-        element['processing_time'] = str(datetime.now())
-        yield element
+#     #Process function to deal with data
+#     def process(self, element):
+#         from datetime import datetime
+#         #Add Processing time field
+#         element['processing_time'] = str(datetime.now())
+#         yield element
 
 
 
@@ -132,7 +153,7 @@ class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
         calculate = (pcoll
             |"Calculate distances" >> beam.Map(CalculateDistances)
-            |"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
+            #|"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
         )
 
         return calculate

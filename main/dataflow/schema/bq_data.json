@@ -72,7 +72,7 @@
     },
     {
         "mode": "NULLABLE",
-        "name": "processing_time",
+        "name": "timestamp",
         "type": "STRING"
     }
     ]
