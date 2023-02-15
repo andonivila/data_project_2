@@ -1,0 +1,79 @@
+{
+    "fields": [
+    {
+        "mode": "NULLABLE",
+        "name": "user_id",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_id",
+        "type": "STRING"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "userinit_lat",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "userinit_lng",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_lat",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "taxi_lng",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "init_distance",
+        "type": "NUMERIC"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "userfinal_lat",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "userfinal_lng",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "final_distance",
+        "type": "NUMERIC"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "total_distance",
+        "type": "FLOAT64"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "taxibase_fare",
+        "type": "FLOAT64"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "taxikm_fare",
+        "type": "FLOAT64"
+    }, 
+    {
+        "mode": "NULLABLE",
+        "name": "transaction_amount",
+        "type": "FLOAT64"
+    },
+    {
+        "mode": "NULLABLE",
+        "name": "timestamp",
+        "type": "STRING"
+    }
+    ]
+}
