@@ -38,15 +38,6 @@ class PubSubMessages:
         self.publisher.transport.close()
         logging.info("PubSub Client closed.")
 
-#Generate a random Spanish phone number
-def generate_phone_number():
-  country_code = "+34"
-  primer_numero = str(6)
-  segundos_3_digits = str(random.randint(1, 9999)).zfill(3)
-  terceros_3_digits = str(random.randint(1, 9999)).zfill(3)
-  phone_number = country_code + " " + primer_numero + segundos_3_digits + terceros_3_digits
-  
-  return phone_number
 
 # Generate random 8 digit user_id
 def generate_user_id():
@@ -60,9 +51,6 @@ def generatedata():
 
     data={}
     data["user_id"] = generate_user_id()
-    data["user_name"] = fake.name()
-    data["user_phone_number"] = generate_phone_number()
-    data["user_email"] = fake.email()
     data["userinit_lat"] = str(random.uniform(39.4, 39.5))
     data["userinit_lng"] = str(random.uniform(-0.4, -0.3))
     data["userfinal_lat"] = str(random.uniform(39.4, 39.5))

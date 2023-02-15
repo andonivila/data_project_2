@@ -37,13 +37,10 @@ clv_gm = os.getenv('CLAVE_API_GOOGLE_MAPS')
 def ParsePubSubMessage(message):
     #Decode PubSub message in order to deal with
     pubsubmessage = message.data.decode('utf-8')
-
     #Convert string decoded in json format(element by element)
     row = json.loads(pubsubmessage)
-
     #Logging
     logging.info("Receiving message from PubSub:%s", pubsubmessage)
-
     #Return function
     return ('DP2',row)
 
@@ -112,16 +109,19 @@ def CalculateDistances(element):
     return bq_element
 
 
+'''DoFn Classes'''
+
 #DoFn01: Add processing timestamp
 class AddTimestampDoFn(beam.DoFn):
 
     #Process function to deal with data
     def process(self, element):
         from datetime import datetime
-
         #Add Processing time field
         element['processing_time'] = str(datetime.now())
         yield element
+
+
 
 '''PTransform Classes'''
 
@@ -129,9 +129,15 @@ class BussinessLogic(beam.PTransform):
     def expand(self, pcoll):
         calculate = (pcoll
             |"Calculate distances" >> beam.Map(CalculateDistances)
+            |"Add timestamp" >> beam.ParDo(AddTimestampDoFn())
         )
 
         return calculate
+
+
+
+
+
 
 '''Dataflow Process'''
 def run_pipeline():
