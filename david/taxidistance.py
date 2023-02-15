@@ -16,10 +16,9 @@ taxi_position = Taxi_lat, Taxi_lng
 user_position  = Userinit_lat, Userinit_lng
 user_destination = Userfinal_lat, Userfinal_lng
 
+# Enter the Google Maps API_KEY
 load_dotenv()
-
-# Introducir la API_KEY de Google Maps
-clv_gm = str(os.environ['CLAVE_API_GOOGLE_MAPS'])
+clv_gm = os.getenv('CLAVE_API_GOOGLE_MAPS')
 
 # Realiza una solicitud a la API de Google Maps
 gmaps = Client(key=clv_gm) 
